@@ -1,0 +1,7 @@
+[
+    { "TicketID": "1", "TicketType": "บัตรดรีมเวิลด์วีซ่า", "TimeCheck": "10:00:10" },
+    { "TicketID": "2", "TicketType": "บัตรรวมเครื่องเล่น", "TimeCheck": "10:01:54" },
+    { "TicketID": "3", "TicketType": "บัตรผ่านประตู", "TimeCheck": "10:30:54" },
+    { "TicketID": "4", "TicketType": "บัตรผ่านประตู", "TimeCheck": "10:31:05" },
+    { "TicketID": "5", "TicketType": "บัตรรวมเครื่องเล่น", "TimeCheck": "10:31:58" }
+]

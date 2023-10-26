@@ -1,0 +1,8 @@
+[
+    { "FastpassID": "1", "Name": "Sky Coaster - สกายโคสเตอร์", "Time": "10:00:10" },
+    { "FastpassID": "2", "Name": "Tornado - ทอร์นาโด", "Time": "10:01:54" },
+    { "FastpassID": "3", "Name": "Super Splash - ซูเปอร์สแปลช", "Time": "10:01:54" },
+    { "FastpassID": "4", "Name": "Bump Car - รถบั๊มมหาสนุก", "Time": "10:01:54" },
+    { "FastpassID": "5", "Name": "Grand Canyon - แกรนด์แคนยอน", "Time": "10:01:54" },
+    { "FastpassID": "6", "Name": "Black Hole - แบล็กโฮล", "Time": "10:01:54" }
+]
