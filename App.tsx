@@ -3,9 +3,11 @@ import { StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "./src/screen/HomeScreen";
-import TicketScreen from "./src/screen/TicketScreen";
+// import TicketScreen from "./src/screen/TicketScreen";
+import TicketDetailScreen from "./src/screen/TicketDetailScreen";
 import FastpassScreen from "./src/screen/FastpassScreen";
 import ScannerScreen from "./src/screen/ScannerScreen";
+import ScannerOutScreen from "./src/screen/ScannerOutScreen";
 import LoginScreen from "./src/screen/LoginScreen";
 import ChangePassword from "./src/screen/ChangePassword";
 import QueueScreen from "./src/screen/QueueScreen";
@@ -18,6 +20,7 @@ type AppStackParamList = {
     Ticket: undefined;
     Fastpass: undefined;
     Scanner: undefined;
+    ScannerOut: undefined;
     Queue: undefined;
     Total: undefined;
 };
@@ -34,7 +37,7 @@ const routes: Array<React.ComponentProps<typeof Stack.Screen>> = [
     },
     {
         name: "Ticket",
-        component: TicketScreen,
+        component: TicketDetailScreen,
         options: {
             headerShown: false,
         },
@@ -49,6 +52,13 @@ const routes: Array<React.ComponentProps<typeof Stack.Screen>> = [
     {
         name: "Scanner",
         component: ScannerScreen,
+        options: {
+            headerShown: false,
+        },
+    },
+    {
+        name: "ScannerOut",
+        component: ScannerOutScreen,
         options: {
             headerShown: false,
         },

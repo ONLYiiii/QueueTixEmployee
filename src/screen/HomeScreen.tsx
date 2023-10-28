@@ -23,9 +23,6 @@ const HomeScreen = ({ route }: { route: any }) => {
         getAccountType("email").then((email: string | null) => {
             if (email) {
                 setEmail(email);
-                fetchImg().then((picture: string) => {
-                    setPicture(picture);
-                });
             }
         });
         getAccountType("types").then((types: string | null) => {
@@ -35,6 +32,12 @@ const HomeScreen = ({ route }: { route: any }) => {
             }
         });
     }, []);
+
+    useEffect(() => {
+        fetchImg().then((picture: string) => {
+            setPicture(picture);
+        });
+    }, [email]);
 
     return (
         <SafeAreaView style={{ flex: 1, paddingTop: 50, backgroundColor: "white" }}>
@@ -84,7 +87,19 @@ const HomeScreen = ({ route }: { route: any }) => {
                         <View style={styles.content_Scanner}>
                             <Scanner size={50} color="#F16B4E" />
                         </View>
-                        <Text style={{ fontSize: 20, fontWeight: "500", marginTop: 5 }}>Scanner</Text>
+                        <Text style={{ fontSize: 20, fontWeight: "500", marginTop: 5 }}>Check In</Text>
+                    </View>
+                </TouchableNativeFeedback>
+                <TouchableNativeFeedback
+                    onPress={() => {
+                        navigation.navigate("ScannerOut");
+                    }}
+                >
+                    <View style={styles.button_Scanner}>
+                        <View style={styles.content_Scanner}>
+                            <Scanner size={50} color="#F16B4E" />
+                        </View>
+                        <Text style={{ fontSize: 20, fontWeight: "500", marginTop: 5 }}>Check Out</Text>
                     </View>
                 </TouchableNativeFeedback>
                 <View style={{ flexDirection: "row", width: "100%", height: "27%", columnGap: 10 }}>
@@ -121,7 +136,7 @@ const HomeScreen = ({ route }: { route: any }) => {
 
 const styles = StyleSheet.create({
     button_Scanner: {
-        width: "80%",
+        width: "40%",
         height: "25%",
         backgroundColor: "#FFFFFF",
         borderRadius: 4,

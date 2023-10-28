@@ -2,76 +2,51 @@ import { View, Text, Modal, StyleSheet, TouchableHighlight } from "react-native"
 import React, { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import QrcodeScanner from "../components/QrcodeScanner";
-import { Check, Cross } from "../components/Icon";
-import { getFullDate, getFullTime } from "../utils/dateFormat";
 import getURL from "../utils/getURL";
-import { useNavigation } from "@react-navigation/native";
+import { getFullDate, getFullTime } from "../utils/dateFormat";
 
-interface fetchDataType {
-    _id?: string;
-    type?: string;
-    timeCheckin?: string;
-    priceType?: string;
-    status: string;
-}
-
-const ScannerScreen = () => {
+const TicketDetailScreen = () => {
     const [showModal, setShowModal] = useState(false);
     const [hasScanned, setHasScanned] = useState(false);
-    const [success, setSuccess] = useState(false);
     const [messageFail, setmassageFail] = useState("");
-    const [fetchData, setFetchData]: [fetchDataType, Dispatch<SetStateAction<fetchDataType>>] = useState({
-        status: "",
+    const [fetchData, setFetchData]: [any, Dispatch<SetStateAction<any>>] = useState({
+        purchaseoftypesId: "",
+        user_email: "",
+        dateofuse: "",
+        date_of_use: "",
+        time_check: "",
+        types: "",
+        ticketTypes: "",
+        status_ticket: -1,
     });
 
     const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
-        //ข้อมูลที่สแกน QR Code มี type(เวอร์ชั่น QR Code) กับ data
         setHasScanned(true);
-        fetch(getURL() + "qrcode/verify/", {
-            method: "POST",
-            body: JSON.stringify({ data: JSON.parse(data), mode: "IN" }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then(async (response) => {
-            const result: fetchDataType = await response.json();
-            console.log(result);
-            if (response.status === 200) {
-                setFetchData(result);
-                setSuccess(true);
-                setmassageFail("");
-                setShowModal(true);
-            } else if (response.status === 400) {
-                setSuccess(false);
-                if (result.status === "no ticket") {
-                    setmassageFail("ไม่มีตั๋วนี้ในระบบ");
-                    setShowModal(true);
-                } else if (result.status === "used") {
-                    setFetchData(result);
-                    setmassageFail("ตั๋วนี้เคยใช้ไปเเล้ว");
-                    setShowModal(true);
-                } else if (result.status === "not this date") {
-                    setFetchData(result);
-                    setmassageFail("ตั๋วนี้ยังไม่สามารถใช้ได้");
-                    setShowModal(true);
-                } else if (result.status === "exit") {
-                    setFetchData(result);
-                    setmassageFail("ตั๋วนี้ถูกใช้และออกจากสวนสนุกไปเเล้ว");
-                    setShowModal(true);
-                } else if (result.status === "expired") {
-                    setFetchData(result);
-                    setmassageFail("ตั๋วนี้หมดอายุเเล้ว");
-                    setShowModal(true);
-                } else if (result.status === "error") {
-                    setmassageFail("เกิดข้อผิดพลาด");
-                    setShowModal(true);
-                }
-            }
-        });
-
-        // setShowModal(true);
-        // Handle the scanned QR code data here
-        // console.log(`Scanned QR code with type: ${type} and data: ${data}`);
+        try {
+            fetch(getURL() + "send_TicketDetail?data=" + data)
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        if (response.status === 404) {
+                            setmassageFail("ไม่พบบัตรผ่านนี้ในระบบ");
+                        } else {
+                            setmassageFail("เกิดข้อผิดพลาด");
+                        }
+                        return undefined;
+                    }
+                })
+                .then((data) => {
+                    if (data !== "undefined") {
+                        setFetchData(data);
+                    }
+                });
+        } catch (error) {
+            console.log(error);
+            setmassageFail("เกิดข้อผิดพลาด");
+        } finally {
+            setShowModal(true);
+        }
     };
 
     return (
@@ -87,7 +62,6 @@ const ScannerScreen = () => {
                     showModal={showModal}
                     setShowModal={setShowModal}
                     setHasScanned={setHasScanned}
-                    success={success}
                     messageFail={messageFail}
                     fetchData={fetchData}
                 />
@@ -100,12 +74,11 @@ interface modalController {
     showModal: boolean;
     setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
     setHasScanned: React.Dispatch<React.SetStateAction<boolean>>;
-    success: boolean;
     messageFail: string;
-    fetchData: fetchDataType;
+    fetchData: any;
 }
 
-const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageFail, fetchData }: modalController) => {
+const ResultModal = ({ showModal, setShowModal, setHasScanned, messageFail, fetchData }: modalController) => {
     return (
         <Modal visible={showModal} transparent={true} animationType="slide">
             <View style={{ backgroundColor: "rgba(0,0,0,0.25)", flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -119,7 +92,7 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
                         borderRadius: 8,
                     }}
                 >
-                    {success ? (
+                    {/* {success ? (
                         <Check
                             size={90}
                             color="#2EDD3D"
@@ -135,23 +108,52 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
                     {messageFail === "ตั๋วนี้เคยใช้ไปเเล้ว" ? (
                         <>
                             <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
-                            <Text style={{ fontSize: 14 }}>ใช้ไปแล้วเมื่อวันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
-                            <Text style={{ fontSize: 14 }}>เวลา {getFullTime(new Date(fetchData.timeCheckin!))}</Text>
+                            <Text style={{ fontSize: 14, color: "red" }}>ใช้ไปแล้วเมื่อ {getFullTime(new Date(fetchData.timeCheckin!))}</Text>
                         </>
-                    ) : messageFail === "ตั๋วนี้ยังไม่สามารถใช้ได้" || messageFail === "ตั๋วนี้หมดอายุเเล้ว" ? (
+                    ) : messageFail === "ตั๋วนี้ยังไม่สามารถใช้ได้" ? (
                         <>
                             <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
-                            <Text style={{ fontSize: 14 }}>ใช้ได้วันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
-                        </>
-                    ) : messageFail === "ตั๋วนี้ถูกใช้และออกจากสวนสนุกไปเเล้ว" ? (
-                        <>
-                            <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
-                            <Text style={{ fontSize: 14 }}>ออกจากสวนสนุกเมื่อ {getFullTime(new Date(fetchData.timeCheckin!))}</Text>
+                            <Text style={{ fontSize: 14, color: "red" }}>ใช้ได้วันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
                         </>
                     ) : (
                         <Text style={{ fontSize: 14 }}>
                             {success ? `Time Check in : ${getFullTime(new Date(fetchData.timeCheckin!))}` : messageFail}
                         </Text>
+                    )} */}
+                    {/* interface fetchDataType {
+                        purchaseoftypesId: string;
+                        user_email: string;
+                        dateofuse: string;
+                        date_of_use: string;
+                        time_check: string;
+                        type: string;
+                        ticketTypes: string;
+                        status_ticket: number;
+                    } */}
+                    {messageFail === "" ? (
+                        <>
+                            <Text style={{ textAlign: "center" }}>รายละเอียดบัตรผ่าน</Text>
+                            <Text>อีเมล: {fetchData.user_email}</Text>
+                            <Text>
+                                ประเภทบัตร: {fetchData.ticketTypes} - {fetchData.types === "Adult" ? "บัตรผู้ใหญ่" : "บัตรเด็ก"}
+                            </Text>
+                            <Text>วันที่ใช้บัตรได้: {getFullDate(new Date(fetchData.date_of_use))}</Text>
+                            <Text>
+                                สถานะบัตร:{" "}
+                                {fetchData.status_ticket === 0
+                                    ? "ยังไม่ถูกใช้งาน"
+                                    : fetchData.status_ticket === 1
+                                    ? "ใช้แล้ว"
+                                    : fetchData.status_ticket === 2
+                                    ? "ออกจากสวนสนุกแล้ว"
+                                    : "หมดอายุ"}
+                            </Text>
+                            <Text>
+                                เวลาที่ใช้งาน: {fetchData.time_check !== null ? getFullTime(new Date(fetchData.time_check)) : "ยังไม่ถูกใช้งาน"}
+                            </Text>
+                        </>
+                    ) : (
+                        <Text>Error Found: {messageFail}</Text>
                     )}
                     <TouchableHighlight
                         onPress={() => {
@@ -168,6 +170,8 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
     );
 };
 
+export default TicketDetailScreen;
+
 const styles = StyleSheet.create({
     CloseBotton: {
         width: 220,
@@ -178,4 +182,3 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
 });
-export default ScannerScreen;

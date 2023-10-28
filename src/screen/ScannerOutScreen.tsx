@@ -15,7 +15,7 @@ interface fetchDataType {
     status: string;
 }
 
-const ScannerScreen = () => {
+const ScannerOutScreen = () => {
     const [showModal, setShowModal] = useState(false);
     const [hasScanned, setHasScanned] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -29,7 +29,7 @@ const ScannerScreen = () => {
         setHasScanned(true);
         fetch(getURL() + "qrcode/verify/", {
             method: "POST",
-            body: JSON.stringify({ data: JSON.parse(data), mode: "IN" }),
+            body: JSON.stringify({ data: JSON.parse(data), mode: "OUT" }),
             headers: {
                 "Content-Type": "application/json",
             },
@@ -46,9 +46,9 @@ const ScannerScreen = () => {
                 if (result.status === "no ticket") {
                     setmassageFail("ไม่มีตั๋วนี้ในระบบ");
                     setShowModal(true);
-                } else if (result.status === "used") {
+                } else if (result.status === "not used") {
                     setFetchData(result);
-                    setmassageFail("ตั๋วนี้เคยใช้ไปเเล้ว");
+                    setmassageFail("ตั๋วนี้ยังไม่ถูกใช้งาน");
                     setShowModal(true);
                 } else if (result.status === "not this date") {
                     setFetchData(result);
@@ -129,16 +129,14 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
                         <Cross size={90} color="red" />
                     )}
                     <Text style={{ fontSize: 16, textAlign: "center" }}>
-                        {success ? `ใช้${fetchData.type} - บัตร${fetchData.priceType === "Adult" ? "ผู้ใหญ่" : "เด็ก"} สำเร็จ` : `ใช้บัตรไม่สำเร็จ`}
+                        {success
+                            ? `${fetchData.type} - บัตร${fetchData.priceType === "Adult" ? "ผู้ใหญ่" : "เด็ก"} ออกจากสวนสนุกสำเร็จ`
+                            : `ออกจากสวนสนุกไม่สำเร็จ`}
                     </Text>
 
-                    {messageFail === "ตั๋วนี้เคยใช้ไปเเล้ว" ? (
-                        <>
-                            <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
-                            <Text style={{ fontSize: 14 }}>ใช้ไปแล้วเมื่อวันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
-                            <Text style={{ fontSize: 14 }}>เวลา {getFullTime(new Date(fetchData.timeCheckin!))}</Text>
-                        </>
-                    ) : messageFail === "ตั๋วนี้ยังไม่สามารถใช้ได้" || messageFail === "ตั๋วนี้หมดอายุเเล้ว" ? (
+                    {messageFail === "ตั๋วนี้ยังไม่สามารถใช้ได้" ||
+                    messageFail === "ตั๋วนี้หมดอายุเเล้ว" ||
+                    messageFail === "ตั๋วนี้ยังไม่ถูกใช้งาน" ? (
                         <>
                             <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
                             <Text style={{ fontSize: 14 }}>ใช้ได้วันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
@@ -146,7 +144,8 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
                     ) : messageFail === "ตั๋วนี้ถูกใช้และออกจากสวนสนุกไปเเล้ว" ? (
                         <>
                             <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
-                            <Text style={{ fontSize: 14 }}>ออกจากสวนสนุกเมื่อ {getFullTime(new Date(fetchData.timeCheckin!))}</Text>
+                            <Text style={{ fontSize: 14 }}>ออกจากสวนสนุกเมื่อวันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
+                            <Text style={{ fontSize: 14 }}>เวลา {getFullTime(new Date(fetchData.timeCheckin!))}</Text>
                         </>
                     ) : (
                         <Text style={{ fontSize: 14 }}>
@@ -178,4 +177,4 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
 });
-export default ScannerScreen;
+export default ScannerOutScreen;
