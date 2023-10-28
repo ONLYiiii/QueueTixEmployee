@@ -6,7 +6,7 @@ import type { Express, Request, Response } from "express";
 import type Ticket from "./types/ticket";
 import { qrcodeGenerate } from "./controller/Genqrcode.controller";
 import { testConnectDb } from "./configs/database";
-import { findPurchaseTicketID } from "./database/purchaseTicket";
+import { findPurchaseTicketID, findTicketDetails } from "./database/purchaseTicket";
 import { CheckTicketID } from "./controller/Vertifyqrcode.controller";
 import { getFullDate } from "./service/dateFormat";
 import { Find_AccountEmployee } from "./database/employee";
@@ -101,11 +101,11 @@ app.post("/generate_qrcode", (req: Request, res: Response) => {
     });
 });
 app.post("/qrcode/verify", (req: Request, res: Response) => {
-    console.log(req.body);
-    const email = req.body.user_email;
-    const id = req.body.purchaseoftypesId;
-    const dateofuse = req.body.dateofuse;
-    CheckTicketID(email, id, dateofuse).then((result) => {
+    const mode = req.body.mode;
+    const email = req.body.data.user_email;
+    const id = req.body.data.purchaseoftypesId;
+    const dateofuse = req.body.data.dateofuse;
+    CheckTicketID(email, id, dateofuse, mode).then((result) => {
         if (result.status === "success") {
             res.status(200).send(result);
             res.end();
@@ -116,18 +116,21 @@ app.post("/qrcode/verify", (req: Request, res: Response) => {
     });
 });
 
-app.get("/send_TicketList", (req: Request, res: Response) => {
-    try {
-        const filePath: string = path.join(__dirname, "model/ticketlist.json");
-        const jsonString = fs.readFileSync(filePath, "utf8");
-        const jsonOject: Ticket[] = JSON.parse(jsonString);
-        const data = jsonOject.filter((item) => getFullDate(new Date(item.updated_at)) === getFullDate(new Date()));
-        res.send(data);
-        res.end();
-    } catch (error) {
-        res.status(404);
-        res.end();
-    }
+app.get("/send_TicketDetail", (req: Request, res: Response) => {
+    const data = JSON.parse(req.query.data as string);
+    findTicketDetails(data.purchaseoftypesId, data.user_email, data.dateofuse).then((ticketDetails) => {
+        if (!ticketDetails) {
+            res.status(400);
+            res.end();
+        } else if (ticketDetails === "No Ticket") {
+            res.status(404);
+            res.end();
+        } else {
+            const sendData = { ...data, ...ticketDetails };
+            res.send(sendData);
+            res.end();
+        }
+    });
 });
 
 app.listen(4000, () => {

@@ -13,6 +13,36 @@ export async function findPurchaseTicketID(idTicket: string) {
     }
 }
 
+export async function findTicketDetails(_id: string, email: string, dateofuse: string) {
+    try {
+        const sql = (await connection).format(
+            `SELECT ptt.status_ticket, ptt.types, pt.date_of_use, hst.time_check, t.title AS ticketTypes
+            FROM purchaseticket pt
+            JOIN ticket t
+                ON pt.id_ticket = t._id
+            JOIN purchasetickettypes ptt
+                ON ptt.id_purchaseticket = pt._id
+            LEFT JOIN historyscanticket hst
+                ON ptt._id= hst.id_purchaseTicketTypes
+            JOIN user u
+                ON pt.id_user = u._id
+            WHERE ptt._id = ? AND u.email = ? AND pt.date_of_use = ?`,
+            [_id, email, new Date(dateofuse)]
+        );
+        console.log(sql);
+        const [ticketRows] = await (await connection).execute<RowDataPacket[]>(sql);
+        console.log(ticketRows);
+        if (ticketRows.length !== 0) {
+            return ticketRows[0];
+        } else {
+            return "No Ticket";
+        }
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+}
+
 export async function TicketList(idTicket: string) {
     try {
         const sql = (await connection).format(
