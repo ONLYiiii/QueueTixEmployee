@@ -1,23 +1,33 @@
 import express from "express";
-import fs from "fs";
-import path from "path";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import type { Express, Request, Response } from "express";
-import type Ticket from "./types/ticket";
 import { qrcodeGenerate } from "./controller/Genqrcode.controller";
 import { testConnectDb } from "./configs/database";
 import { findPurchaseTicketID, findTicketDetails } from "./database/purchaseTicket";
 import { CheckTicketID } from "./controller/Vertifyqrcode.controller";
-import { getFullDate } from "./service/dateFormat";
-import { Find_AccountEmployee } from "./database/employee";
+import { Find_AccountEmployee, Find_RoleEmployee, Find_AccountPicture } from "./database/employee";
 import { writeTimeCheck } from "./controller/WriteTimecheck";
 import { InputPassword } from "./controller/InputNewPassword";
-import { Find_RoleEmployee } from "./database/employee";
+import getSecretKey from "./service/getSecretKey";
 
 const app: Express = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.post("/verifyJwt", (req: Request, res: Response) => {
+    try {
+        const token: string = req.headers.authorization as string;
+        const decoded: { sub: string } = jwt.verify(token, getSecretKey()) as { sub: string };
+        res.status(200);
+        res.end();
+    } catch (error) {
+        console.log("Error Found In verifyJwt: " + error);
+        res.status(401);
+        res.end();
+    }
+});
 
 app.post("/login", async (req: Request, res: Response) => {
     const input: { email: string; password: string } = req.body;
@@ -29,13 +39,14 @@ app.post("/login", async (req: Request, res: Response) => {
     }
     const result = await bcrypt.compare(input.password, dataEmployee.password);
     if (result) {
+        const token = jwt.sign({ sub: dataEmployee._id }, getSecretKey());
         if (input.password === "12345678") {
             writeTimeCheck(dataEmployee);
-            res.send("Change Password Require");
+            res.send({ token: token, fullname: dataEmployee.fullname, message: "Change Password Require" });
             res.end();
         } else {
             writeTimeCheck(dataEmployee);
-            res.send("Login successful");
+            res.send({ token: token, fullname: dataEmployee.fullname, message: "Login successful" });
             res.end();
         }
     } else {
@@ -45,41 +56,70 @@ app.post("/login", async (req: Request, res: Response) => {
 });
 
 app.get("/accountRole", async (req: Request, res: Response) => {
-    const email: string = req.query.email as string;
-    const types: string = await Find_RoleEmployee(email);
-    console.log(types);
-    res.send(types);
-    res.end();
+    try {
+        const token: string = req.headers.authorization as string;
+        const decoded: { sub: string } = jwt.verify(token, getSecretKey()) as { sub: string };
+        const types: string | false = await Find_RoleEmployee(decoded.sub);
+        if (!types) {
+            res.status(401);
+            res.end();
+        } else {
+            res.send(types);
+            res.end();
+        }
+    } catch (error) {
+        console.log("Error Found In /accountRole: " + error);
+        res.status(400);
+        res.end();
+    }
 });
 
 app.get("/profilepic", async (req: Request, res: Response) => {
-    const email: string = req.query.email as string;
-    const DataUser = await Find_AccountEmployee(email);
-    if (typeof DataUser === "object") {
-        res.send(DataUser.profilePicture);
+    try {
+        const token: string = req.headers.authorization as string;
+        console.log(token ? token : "No Token");
+        const decoded: { sub: string } = jwt.verify(token, getSecretKey()) as { sub: string };
+        const picUser = await Find_AccountPicture(decoded.sub);
+        if (!picUser) {
+            res.status(401);
+            res.end();
+        } else {
+            res.send(picUser);
+            res.end();
+        }
+    } catch (error) {
+        console.log("Error Found In /profilepic: " + error);
+        res.status(400);
         res.end();
     }
 });
 
 app.post("/changePassword", async (req: Request, res: Response) => {
-    const password: string = req.body.password;
-    const email: string = req.body.email;
-    bcrypt.hash(password, 12, (err, hash) => {
-        if (err) {
-            console.log(err);
-            res.end();
-            return;
-        }
-        InputPassword(hash, email).then((result) => {
-            if (result) {
-                res.status(200);
+    try {
+        const password: string = req.body.password;
+        const token: string = req.headers.authorization as string;
+        const decoded: { sub: string } = jwt.verify(token, getSecretKey()) as { sub: string };
+        bcrypt.hash(password, 12, (err, hash) => {
+            if (err) {
+                console.log(err);
                 res.end();
-            } else {
-                res.status(401);
-                res.end();
+                return;
             }
+            InputPassword(hash, decoded.sub).then((result) => {
+                if (result) {
+                    res.status(200);
+                    res.end();
+                } else {
+                    res.status(401);
+                    res.end();
+                }
+            });
         });
-    });
+    } catch (error) {
+        console.log("Error Found In /changePassword: " + error);
+        res.status(400);
+        res.end();
+    }
 });
 
 app.get("/views", (req: Request, res: Response) => {
@@ -126,8 +166,7 @@ app.get("/send_TicketDetail", (req: Request, res: Response) => {
             res.status(404);
             res.end();
         } else {
-            const sendData = { ...data, ...ticketDetails };
-            res.send(sendData);
+            res.send(ticketDetails);
             res.end();
         }
     });
