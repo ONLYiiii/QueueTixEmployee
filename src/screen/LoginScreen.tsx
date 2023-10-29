@@ -1,6 +1,5 @@
 import { View, Text, TextInput, TouchableHighlight, Dimensions } from "react-native";
 import React, { useState } from "react";
-import Constants from "expo-constants";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Error } from "../components/Icon";
@@ -23,38 +22,52 @@ const LoginScreen = () => {
         setInput(newInput);
     };
 
-    const getRoleFetch = (fetchData: string) => {
-        fetch(getURL() + "accountRole?email=" + input.email).then(async (response) => {
-            const types = await response.text();
-            if (response.ok) {
-                await AsyncStorage.setItem("types", types);
-                await AsyncStorage.setItem("email", input.email);
-                if (fetchData === "Login successful") {
-                    navigation.navigate("Home");
+    const getRoleFetch = (fetchData: { token: string; fullname: string; message: string }) => {
+        try {
+            fetch(getURL() + "accountRole", {
+                headers: {
+                    "Content-Type": "application/json",
+                    authorization: fetchData.token,
+                },
+            }).then(async (response) => {
+                const types = await response.text();
+                if (response.ok) {
+                    await AsyncStorage.setItem("types", types);
+                    await AsyncStorage.setItem("token", fetchData.token);
+                    await AsyncStorage.setItem("fullname", fetchData.fullname);
+                    if (fetchData.message === "Login successful") {
+                        navigation.navigate("Home");
+                    } else {
+                        navigation.navigate("Password", { token: fetchData.token });
+                    }
                 } else {
-                    navigation.navigate("Password", { email: input.email });
+                    setErrorBox(true);
                 }
-            } else {
-                setErrorBox(true);
-            }
-        });
+            });
+        } catch (error) {
+            console.log("Error Found In getRoleFetch: " + error);
+        }
     };
 
     const loginFetch = () => {
-        fetch(getURL() + "login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(input),
-        }).then(async (response) => {
-            const fetchData = await response.text();
-            if (response.status === 200) {
-                getRoleFetch(fetchData);
-            } else {
-                setErrorBox(true);
-            }
-        });
+        try {
+            fetch(getURL() + "login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(input),
+            }).then(async (response) => {
+                if (response.status === 200) {
+                    const fetchData: { token: string; fullname: string; message: string } = await response.json();
+                    getRoleFetch(fetchData);
+                } else {
+                    setErrorBox(true);
+                }
+            });
+        } catch (error) {
+            console.log("Error Found In loginFetch: " + error);
+        }
     };
 
     return (
@@ -112,9 +125,7 @@ const LoginScreen = () => {
                                 }}
                             >
                                 <Error size={25} color="red" />
-                                <Text
-                                    style={{ fontSize: 14, color: "red" }}
-                                >{`Your email or password are incorrect.\nPlease try again!`}</Text>
+                                <Text style={{ fontSize: 14, color: "red" }}>{`Your email or password are incorrect.\nPlease try again!`}</Text>
                             </View>
                         )}
                         <TouchableHighlight

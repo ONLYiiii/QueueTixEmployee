@@ -36,37 +36,46 @@ const ScannerOutScreen = () => {
         }).then(async (response) => {
             const result: fetchDataType = await response.json();
             console.log(result);
+            //?--------------------Success--------------------
             if (response.status === 200) {
                 setFetchData(result);
                 setSuccess(true);
                 setmassageFail("");
-                setShowModal(true);
-            } else if (response.status === 400) {
-                setSuccess(false);
-                if (result.status === "no ticket") {
-                    setmassageFail("ไม่มีตั๋วนี้ในระบบ");
-                    setShowModal(true);
-                } else if (result.status === "not used") {
-                    setFetchData(result);
-                    setmassageFail("ตั๋วนี้ยังไม่ถูกใช้งาน");
-                    setShowModal(true);
-                } else if (result.status === "not this date") {
-                    setFetchData(result);
-                    setmassageFail("ตั๋วนี้ยังไม่สามารถใช้ได้");
-                    setShowModal(true);
-                } else if (result.status === "exit") {
-                    setFetchData(result);
-                    setmassageFail("ตั๋วนี้ถูกใช้และออกจากสวนสนุกไปเเล้ว");
-                    setShowModal(true);
-                } else if (result.status === "expired") {
-                    setFetchData(result);
-                    setmassageFail("ตั๋วนี้หมดอายุเเล้ว");
-                    setShowModal(true);
-                } else if (result.status === "error") {
-                    setmassageFail("เกิดข้อผิดพลาด");
-                    setShowModal(true);
-                }
             }
+            //?-----------------------------------------------
+
+            //?--------------------Not_Success--------------------
+            else if (response.status === 400) {
+                setSuccess(false);
+                //?--------------------Not_Success_Status--------------------
+                switch (result.status) {
+                    case "no ticket": //? No Ticket
+                        setmassageFail("ไม่มีตั๋วนี้ในระบบ");
+                        break;
+                    case "not used": //? Not Used
+                        setFetchData(result);
+                        setmassageFail("ตั๋วนี้ยังไม่ถูกใช้งาน");
+                        break;
+                    case "not this date": //? Not Today
+                        setFetchData(result);
+                        setmassageFail("ตั๋วนี้ยังไม่สามารถใช้ได้");
+                        break;
+                    case "exit": //? Already Exit
+                        setFetchData(result);
+                        setmassageFail("ตั๋วนี้ถูกใช้และออกจากสวนสนุกไปเเล้ว");
+                        break;
+                    case "expired": //? Already Expired
+                        setFetchData(result);
+                        setmassageFail("ตั๋วนี้หมดอายุเเล้ว");
+                        break;
+                    case "error": //? Error
+                        setmassageFail("เกิดข้อผิดพลาด");
+                        break;
+                }
+                //?----------------------------------------------------------
+            }
+            //?---------------------------------------------------
+            setShowModal(true); //? Show_Modal
         });
 
         // setShowModal(true);
@@ -134,24 +143,8 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
                             : `ออกจากสวนสนุกไม่สำเร็จ`}
                     </Text>
 
-                    {messageFail === "ตั๋วนี้ยังไม่สามารถใช้ได้" ||
-                    messageFail === "ตั๋วนี้หมดอายุเเล้ว" ||
-                    messageFail === "ตั๋วนี้ยังไม่ถูกใช้งาน" ? (
-                        <>
-                            <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
-                            <Text style={{ fontSize: 14 }}>ใช้ได้วันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
-                        </>
-                    ) : messageFail === "ตั๋วนี้ถูกใช้และออกจากสวนสนุกไปเเล้ว" ? (
-                        <>
-                            <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
-                            <Text style={{ fontSize: 14 }}>ออกจากสวนสนุกเมื่อวันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
-                            <Text style={{ fontSize: 14 }}>เวลา {getFullTime(new Date(fetchData.timeCheckin!))}</Text>
-                        </>
-                    ) : (
-                        <Text style={{ fontSize: 14 }}>
-                            {success ? `Time Check in : ${getFullTime(new Date(fetchData.timeCheckin!))}` : messageFail}
-                        </Text>
-                    )}
+                    <StatusComponent success={success} messageFail={messageFail} fetchData={fetchData} />
+
                     <TouchableHighlight
                         onPress={() => {
                             setShowModal(false);
@@ -165,6 +158,30 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
             </View>
         </Modal>
     );
+};
+
+const StatusComponent = ({ success, messageFail, fetchData }: { success: boolean; messageFail: string; fetchData: fetchDataType }) => {
+    switch (messageFail) {
+        case "ตั๋วนี้ยังไม่สามารถใช้ได้":
+        case "ตั๋วนี้หมดอายุเเล้ว":
+        case "ตั๋วนี้ยังไม่ถูกใช้งาน":
+            return (
+                <>
+                    <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
+                    <Text style={{ fontSize: 14 }}>ใช้ได้วันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
+                </>
+            );
+        case "ตั๋วนี้ถูกใช้และออกจากสวนสนุกไปเเล้ว":
+            return (
+                <>
+                    <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
+                    <Text style={{ fontSize: 14 }}>ออกจากสวนสนุกเมื่อวันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
+                    <Text style={{ fontSize: 14 }}>เวลา {getFullTime(new Date(fetchData.timeCheckin!))}</Text>
+                </>
+            );
+        default:
+            return <Text style={{ fontSize: 14 }}>{success ? `Time Check in : ${getFullTime(new Date(fetchData.timeCheckin!))}` : messageFail}</Text>;
+    }
 };
 
 const styles = StyleSheet.create({

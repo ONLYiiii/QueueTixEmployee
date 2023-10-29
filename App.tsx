@@ -2,6 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import InitialScreen from "./src/screen/InitialScreen";
 import HomeScreen from "./src/screen/HomeScreen";
 // import TicketScreen from "./src/screen/TicketScreen";
 import TicketDetailScreen from "./src/screen/TicketDetailScreen";
@@ -14,6 +15,7 @@ import QueueScreen from "./src/screen/QueueScreen";
 import TotalQueue from "./src/screen/TotalQueue";
 
 type AppStackParamList = {
+    Initial: undefined;
     Login: undefined;
     Password: undefined;
     Home: undefined;
@@ -28,6 +30,13 @@ type AppStackParamList = {
 const Stack = createStackNavigator<AppStackParamList>();
 
 const routes: Array<React.ComponentProps<typeof Stack.Screen>> = [
+    {
+        name: "Initial",
+        component: InitialScreen,
+        options: {
+            headerShown: false,
+        },
+    },
     {
         name: "Home",
         component: HomeScreen,
@@ -96,7 +105,7 @@ const routes: Array<React.ComponentProps<typeof Stack.Screen>> = [
 export default function App() {
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="Login">
+            <Stack.Navigator initialRouteName="Initial">
                 {routes.map((routeConfig) => (
                     <Stack.Screen key={routeConfig.name} {...routeConfig} />
                 ))}

@@ -6,38 +6,51 @@ import { useNavigation } from "@react-navigation/native";
 import { dateFormat } from "../utils/dateFormat";
 import getURL from "../utils/getURL";
 
-const HomeScreen = ({ route }: { route: any }) => {
+const HomeScreen = () => {
     const navigation: any = useNavigation();
     const [types, setTypes] = useState("");
-    const [email, setEmail] = useState("");
+    const [fullname, setFullname] = useState("");
     const [picture, setPicture] = useState("");
+    const [token, setToken] = useState("");
 
     const fetchImg = () =>
-        fetch(getURL() + "profilepic?email=" + email).then(async (response) => {
+        fetch(getURL() + "profilepic", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: token,
+            },
+        }).then(async (response) => {
             const picture: string = await response.text();
             // console.log(picture);
             return picture;
         });
 
     useEffect(() => {
-        getAccountType("email").then((email: string | null) => {
-            if (email) {
-                setEmail(email);
+        getAccountType("token").then((getToken: string | null) => {
+            if (getToken) {
+                setToken(getToken);
             }
         });
-        getAccountType("types").then((types: string | null) => {
-            if (types) {
-                const thaiTypes = types === "พนักงานตรวจสอบบัตรผ่านประตู" ? types : `พนักงานประจำเครื่องเล่น${types}`;
+        getAccountType("fullname").then((getFullname: string | null) => {
+            if (getFullname) {
+                setFullname(getFullname);
+            }
+        });
+        getAccountType("types").then((getTypes: string | null) => {
+            if (getTypes) {
+                const thaiTypes = getTypes === "พนักงานตรวจสอบบัตรผ่านประตู" ? getTypes : `พนักงานประจำเครื่องเล่น${getTypes}`;
                 setTypes(thaiTypes);
             }
         });
     }, []);
 
     useEffect(() => {
+        if (token === "") return;
         fetchImg().then((picture: string) => {
             setPicture(picture);
         });
-    }, [email]);
+    }, [token]);
 
     return (
         <SafeAreaView style={{ flex: 1, paddingTop: 50, backgroundColor: "white" }}>
@@ -70,7 +83,7 @@ const HomeScreen = ({ route }: { route: any }) => {
                         {picture !== "" && <Image style={styles.profilePic} source={{ uri: picture }} />}
                     </View>
                     <View style={{ flexDirection: "column", marginLeft: 10, rowGap: 5 }}>
-                        <Text style={{ fontSize: 15, fontWeight: "500" }}>{email}</Text>
+                        <Text style={{ fontSize: 15, fontWeight: "500" }}>{fullname}</Text>
                         <Text style={{ fontSize: 15, color: "#3E3D3D" }}>{types}</Text>
                     </View>
                 </View>

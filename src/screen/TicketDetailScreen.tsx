@@ -5,20 +5,22 @@ import QrcodeScanner from "../components/QrcodeScanner";
 import getURL from "../utils/getURL";
 import { getFullDate, getFullTime } from "../utils/dateFormat";
 
+type ticketDetailType =
+    | {
+          email: string;
+          type: string;
+          priceType: string;
+          date_of_use: Date;
+          entrance_status: number | null;
+          updated_at: Date | null;
+      }
+    | undefined;
+
 const TicketDetailScreen = () => {
     const [showModal, setShowModal] = useState(false);
     const [hasScanned, setHasScanned] = useState(false);
-    const [messageFail, setmassageFail] = useState("");
-    const [fetchData, setFetchData]: [any, Dispatch<SetStateAction<any>>] = useState({
-        purchaseoftypesId: "",
-        user_email: "",
-        dateofuse: "",
-        date_of_use: "",
-        time_check: "",
-        types: "",
-        ticketTypes: "",
-        status_ticket: -1,
-    });
+    const [messageFail, setMessageFail] = useState("");
+    const [fetchData, setFetchData]: [ticketDetailType, Dispatch<SetStateAction<ticketDetailType>>] = useState();
 
     const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
         setHasScanned(true);
@@ -29,9 +31,9 @@ const TicketDetailScreen = () => {
                         return response.json();
                     } else {
                         if (response.status === 404) {
-                            setmassageFail("ไม่พบบัตรผ่านนี้ในระบบ");
+                            setMessageFail("ไม่พบบัตรผ่านนี้ในระบบ");
                         } else {
-                            setmassageFail("เกิดข้อผิดพลาด");
+                            setMessageFail("เกิดข้อผิดพลาด");
                         }
                         return undefined;
                     }
@@ -43,7 +45,7 @@ const TicketDetailScreen = () => {
                 });
         } catch (error) {
             console.log(error);
-            setmassageFail("เกิดข้อผิดพลาด");
+            setMessageFail("เกิดข้อผิดพลาด");
         } finally {
             setShowModal(true);
         }
@@ -75,7 +77,7 @@ interface modalController {
     setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
     setHasScanned: React.Dispatch<React.SetStateAction<boolean>>;
     messageFail: string;
-    fetchData: any;
+    fetchData: ticketDetailType;
 }
 
 const ResultModal = ({ showModal, setShowModal, setHasScanned, messageFail, fetchData }: modalController) => {
@@ -92,65 +94,16 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, messageFail, fetc
                         borderRadius: 8,
                     }}
                 >
-                    {/* {success ? (
-                        <Check
-                            size={90}
-                            color="#2EDD3D"
-                            // style={{ backgroundColor: "white", borderRadius: 8 }}
-                        />
-                    ) : (
-                        <Cross size={90} color="red" />
-                    )}
-                    <Text style={{ fontSize: 16, textAlign: "center" }}>
-                        {success ? `ใช้${fetchData.type} - บัตร${fetchData.priceType === "Adult" ? "ผู้ใหญ่" : "เด็ก"} สำเร็จ` : `ใช้บัตรไม่สำเร็จ`}
-                    </Text>
-
-                    {messageFail === "ตั๋วนี้เคยใช้ไปเเล้ว" ? (
-                        <>
-                            <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
-                            <Text style={{ fontSize: 14, color: "red" }}>ใช้ไปแล้วเมื่อ {getFullTime(new Date(fetchData.timeCheckin!))}</Text>
-                        </>
-                    ) : messageFail === "ตั๋วนี้ยังไม่สามารถใช้ได้" ? (
-                        <>
-                            <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
-                            <Text style={{ fontSize: 14, color: "red" }}>ใช้ได้วันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
-                        </>
-                    ) : (
-                        <Text style={{ fontSize: 14 }}>
-                            {success ? `Time Check in : ${getFullTime(new Date(fetchData.timeCheckin!))}` : messageFail}
-                        </Text>
-                    )} */}
-                    {/* interface fetchDataType {
-                        purchaseoftypesId: string;
-                        user_email: string;
-                        dateofuse: string;
-                        date_of_use: string;
-                        time_check: string;
-                        type: string;
-                        ticketTypes: string;
-                        status_ticket: number;
-                    } */}
-                    {messageFail === "" ? (
+                    {typeof fetchData !== "undefined" ? (
                         <>
                             <Text style={{ textAlign: "center" }}>รายละเอียดบัตรผ่าน</Text>
-                            <Text>อีเมล: {fetchData.user_email}</Text>
+                            <Text>อีเมล: {fetchData.email}</Text>
                             <Text>
-                                ประเภทบัตร: {fetchData.ticketTypes} - {fetchData.types === "Adult" ? "บัตรผู้ใหญ่" : "บัตรเด็ก"}
+                                ประเภทบัตร: {fetchData.type} - {fetchData.priceType === "Adult" ? "บัตรผู้ใหญ่" : "บัตรเด็ก"}
                             </Text>
-                            <Text>วันที่ใช้บัตรได้: {getFullDate(new Date(fetchData.date_of_use))}</Text>
-                            <Text>
-                                สถานะบัตร:{" "}
-                                {fetchData.status_ticket === 0
-                                    ? "ยังไม่ถูกใช้งาน"
-                                    : fetchData.status_ticket === 1
-                                    ? "ใช้แล้ว"
-                                    : fetchData.status_ticket === 2
-                                    ? "ออกจากสวนสนุกแล้ว"
-                                    : "หมดอายุ"}
-                            </Text>
-                            <Text>
-                                เวลาที่ใช้งาน: {fetchData.time_check !== null ? getFullTime(new Date(fetchData.time_check)) : "ยังไม่ถูกใช้งาน"}
-                            </Text>
+                            <Text>วันที่ใช้บัตรได้: {getFullDate(fetchData.date_of_use)}</Text>
+                            <Text>สถานะบัตร: {statusMessage(fetchData.entrance_status)}</Text>
+                            {fetchData.updated_at && <Text>เวลาที่ใช้งาน: {getFullTime(fetchData.updated_at)}</Text>}
                         </>
                     ) : (
                         <Text>Error Found: {messageFail}</Text>
@@ -168,6 +121,19 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, messageFail, fetc
             </View>
         </Modal>
     );
+};
+
+const statusMessage = (entrance_status: number | null) => {
+    switch (entrance_status) {
+        case 0:
+            return "ใช้แล้ว";
+        case 1:
+            return "ออกจากสวนสนุกแล้ว";
+        case 2:
+            return "หมดอายุ";
+        default:
+            return "ยังไม่ถูกใช้งาน";
+    }
 };
 
 export default TicketDetailScreen;

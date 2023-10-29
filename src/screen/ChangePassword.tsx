@@ -8,15 +8,16 @@ const ChangePassword = ({ route }: { route: any }) => {
 
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const { email } = route.params;
+    const { token } = route.params;
     const handleCheckPassword = () => {
         if (newPassword === confirmPassword) {
             fetch(getURL() + "changePassword", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    authorization: token,
                 },
-                body: JSON.stringify({ password: newPassword, email: email }),
+                body: JSON.stringify({ password: newPassword }),
             }).then((response) => {
                 if (response.ok) {
                     navigation.navigate("Home");
