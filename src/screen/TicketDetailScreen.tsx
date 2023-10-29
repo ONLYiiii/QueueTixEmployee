@@ -10,9 +10,9 @@ type ticketDetailType =
           email: string;
           type: string;
           priceType: string;
-          date_of_use: Date;
+          date_of_use: string;
           entrance_status: number | null;
-          updated_at: Date | null;
+          updated_at: string | null;
       }
     | undefined;
 
@@ -101,9 +101,9 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, messageFail, fetc
                             <Text>
                                 ประเภทบัตร: {fetchData.type} - {fetchData.priceType === "Adult" ? "บัตรผู้ใหญ่" : "บัตรเด็ก"}
                             </Text>
-                            <Text>วันที่ใช้บัตรได้: {getFullDate(fetchData.date_of_use)}</Text>
+                            <Text>วันที่ใช้บัตรได้: {getFullDate(new Date(fetchData.date_of_use))}</Text>
                             <Text>สถานะบัตร: {statusMessage(fetchData.entrance_status)}</Text>
-                            {fetchData.updated_at && <Text>เวลาที่ใช้งาน: {getFullTime(fetchData.updated_at)}</Text>}
+                            {fetchData.updated_at && <Text>เวลาที่ใช้งาน: {getFullTime(new Date(fetchData.updated_at))}</Text>}
                         </>
                     ) : (
                         <Text>Error Found: {messageFail}</Text>

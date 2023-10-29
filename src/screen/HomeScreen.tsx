@@ -124,12 +124,12 @@ const HomeScreen = () => {
                             <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 5 }}>Ticket</Text>
                         </View>
                     </TouchableNativeFeedback>
-                    <TouchableNativeFeedback onPress={() => navigation.navigate("Fastpass")}>
+                    <TouchableNativeFeedback onPress={() => navigation.navigate("Rides")}>
                         <View style={styles.button_Ticket}>
                             <View style={styles.content_Fastpass}>
                                 <Fastpass size={50} color="#00AD50" />
                             </View>
-                            <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 5 }}>Fastpass</Text>
+                            <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 5 }}>Rides</Text>
                         </View>
                     </TouchableNativeFeedback>
                 </View>

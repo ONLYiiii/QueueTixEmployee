@@ -13,6 +13,7 @@ import LoginScreen from "./src/screen/LoginScreen";
 import ChangePassword from "./src/screen/ChangePassword";
 import QueueScreen from "./src/screen/QueueScreen";
 import TotalQueue from "./src/screen/TotalQueue";
+import RidesScannerScreen from "./src/screen/RidesScannerScreen";
 
 type AppStackParamList = {
     Initial: undefined;
@@ -25,6 +26,7 @@ type AppStackParamList = {
     ScannerOut: undefined;
     Queue: undefined;
     Total: undefined;
+    Rides: undefined;
 };
 
 const Stack = createStackNavigator<AppStackParamList>();
@@ -96,6 +98,13 @@ const routes: Array<React.ComponentProps<typeof Stack.Screen>> = [
     {
         name: "Password",
         component: ChangePassword,
+        options: {
+            headerShown: false,
+        },
+    },
+    {
+        name: "Rides",
+        component: RidesScannerScreen,
         options: {
             headerShown: false,
         },
