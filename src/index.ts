@@ -11,10 +11,15 @@ import { writeTimeCheck } from "./controller/WriteTimecheck";
 import { InputPassword } from "./controller/InputNewPassword";
 import getSecretKey from "./service/getSecretKey";
 
+//? Routes
+import ridesRoute from "./routes/ridesRoute";
+
 const app: Express = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/rides", ridesRoute);
 
 app.post("/verifyJwt", (req: Request, res: Response) => {
     try {
