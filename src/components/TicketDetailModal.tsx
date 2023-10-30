@@ -1,8 +1,6 @@
 import { View, Text, Modal, StyleSheet, TouchableHighlight } from "react-native";
-import React, { useState } from "react";
+import React from "react";
 import type { Dispatch, SetStateAction } from "react";
-import QrcodeScanner from "../components/QrcodeScanner";
-import ticketDetails from "../utils/FetchData/ticketDetails";
 import { getFullDate, getFullTime } from "../utils/dateFormat";
 
 type ticketDetailType =
@@ -16,46 +14,14 @@ type ticketDetailType =
       }
     | undefined;
 
-const TicketDetailScreen = () => {
-    const [showModal, setShowModal] = useState(false);
-    const [hasScanned, setHasScanned] = useState(false);
-    const [messageFail, setMessageFail] = useState("");
-    const [fetchData, setFetchData]: [ticketDetailType, Dispatch<SetStateAction<ticketDetailType>>] = useState();
-
-    const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
-        ticketDetails(data, setMessageFail, setShowModal, setFetchData, setHasScanned);
-    };
-
-    return (
-        <>
-            <View style={{ flex: 2 }}>
-                <QrcodeScanner handleBarCodeScanned={handleBarCodeScanned} hasScanned={hasScanned} />
-            </View>
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                <Text style={{ textAlign: "center" }}>
-                    คณสามารถสเเกนคิวอาร์โค้ดบัตรผ่านสวนสนุกเเละบัตรคิวfastpass{"\n"}เพื่อยืนยันการใช้งานของลูกค้าได้
-                </Text>
-                <ResultModal
-                    showModal={showModal}
-                    setShowModal={setShowModal}
-                    setHasScanned={setHasScanned}
-                    messageFail={messageFail}
-                    fetchData={fetchData}
-                />
-            </View>
-        </>
-    );
-};
-
 interface modalController {
     showModal: boolean;
     setShowModal: Dispatch<SetStateAction<boolean>>;
-    setHasScanned: Dispatch<SetStateAction<boolean>>;
     messageFail: string;
     fetchData: ticketDetailType;
 }
 
-const ResultModal = ({ showModal, setShowModal, setHasScanned, messageFail, fetchData }: modalController) => {
+const TicketDetailModal = ({ showModal, setShowModal, messageFail, fetchData }: modalController) => {
     return (
         <Modal visible={showModal} transparent={true} animationType="slide">
             <View style={{ backgroundColor: "rgba(0,0,0,0.25)", flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -86,7 +52,6 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, messageFail, fetc
                     <TouchableHighlight
                         onPress={() => {
                             setShowModal(false);
-                            setHasScanned(false);
                         }}
                         style={styles.CloseBotton}
                     >
@@ -97,7 +62,6 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, messageFail, fetc
         </Modal>
     );
 };
-
 const statusMessage = (entrance_status: number | null) => {
     switch (entrance_status) {
         case 0:
@@ -111,8 +75,6 @@ const statusMessage = (entrance_status: number | null) => {
     }
 };
 
-export default TicketDetailScreen;
-
 const styles = StyleSheet.create({
     CloseBotton: {
         width: 220,
@@ -123,3 +85,5 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
 });
+
+export default TicketDetailModal;

@@ -1,11 +1,12 @@
-import { View, Text, Modal, StyleSheet, TouchableHighlight } from "react-native";
+import { View, Text, Modal, StyleSheet, TouchableHighlight, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import QrcodeScanner from "../components/QrcodeScanner";
 import { Check, Cross } from "../components/Icon";
 import { getFullDate, getFullTime } from "../utils/dateFormat";
 import getURL from "../utils/getURL";
-import { useNavigation } from "@react-navigation/native";
+import TicketDetailModal from "../components/TicketDetailModal";
+import ticketDetails from "../utils/FetchData/ticketDetails";
 
 interface fetchDataType {
     _id?: string;
@@ -15,11 +16,23 @@ interface fetchDataType {
     status: string;
 }
 
+type ticketDetailType =
+    | {
+          email: string;
+          type: string;
+          priceType: string;
+          date_of_use: string;
+          entrance_status: number | null;
+          updated_at: string | null;
+      }
+    | undefined;
+
 const ScannerScreen = () => {
     const [showModal, setShowModal] = useState(false);
     const [hasScanned, setHasScanned] = useState(false);
     const [success, setSuccess] = useState(false);
     const [messageFail, setmassageFail] = useState("");
+    const [scannerData, setScannerData] = useState("");
     const [fetchData, setFetchData]: [fetchDataType, Dispatch<SetStateAction<fetchDataType>>] = useState({
         status: "",
     });
@@ -27,6 +40,7 @@ const ScannerScreen = () => {
     const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
         //ข้อมูลที่สแกน QR Code มี type(เวอร์ชั่น QR Code) กับ data
         setHasScanned(true);
+        setScannerData(data);
         fetch(getURL() + "qrcode/verify/", {
             method: "POST",
             body: JSON.stringify({ data: JSON.parse(data), mode: "IN" }),
@@ -99,6 +113,7 @@ const ScannerScreen = () => {
                     success={success}
                     messageFail={messageFail}
                     fetchData={fetchData}
+                    scannerData={scannerData}
                 />
             </View>
         </>
@@ -112,9 +127,14 @@ interface modalController {
     success: boolean;
     messageFail: string;
     fetchData: fetchDataType;
+    scannerData: string;
 }
 
-const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageFail, fetchData }: modalController) => {
+const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageFail, fetchData, scannerData }: modalController) => {
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [messageFailDetail, setMessageFailDetail] = useState("");
+    const [fetchDataDetail, setFetchDataDetail]: [ticketDetailType, Dispatch<SetStateAction<ticketDetailType>>] = useState();
+
     return (
         <Modal visible={showModal} transparent={true} animationType="slide">
             <View style={{ backgroundColor: "rgba(0,0,0,0.25)", flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -138,7 +158,12 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
                         <Cross size={90} color="red" />
                     )}
                     <Text style={{ fontSize: 16, textAlign: "center" }}>
-                        {success ? `ใช้${fetchData.type} - บัตร${fetchData.priceType === "Adult" ? "ผู้ใหญ่" : "เด็ก"} สำเร็จ` : `ใช้บัตรไม่สำเร็จ`}
+                        {/* {success ? `ใช้${fetchData.type} - บัตร${fetchData.priceType === "Adult" ? "ผู้ใหญ่" : "เด็ก"} สำเร็จ` : `ใช้บัตรไม่สำเร็จ`} */}
+                        {fetchData.type !== undefined &&
+                            fetchData.priceType !== undefined &&
+                            `ใช้${fetchData.type} - บัตร${fetchData.priceType === "Adult" ? "ผู้ใหญ่" : "เด็ก"}`}
+                        {success ? "สำเร็จ" : "ไม่สำเร็จ"}
+                        {fetchData.type === undefined && fetchData.priceType === undefined && `ใช้บัตรเล่นเครื่องเล่นไม่สำเร็จ`}
                     </Text>
 
                     <StatusComponent success={success} messageFail={messageFail} fetchData={fetchData} />
@@ -152,8 +177,22 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
                     >
                         <Text style={{ color: "white", fontSize: 18 }}>Close</Text>
                     </TouchableHighlight>
+                    <TouchableOpacity
+                        style={{ alignSelf: "flex-end", marginRight: 10 }}
+                        onPress={() => {
+                            ticketDetails(scannerData, setMessageFailDetail, setShowDetailModal, setFetchDataDetail);
+                        }}
+                    >
+                        <Text style={{ color: "red", fontSize: 14 }}>ดูข้อมูลเพิ่มเติม</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
+            <TicketDetailModal
+                showModal={showDetailModal}
+                setShowModal={setShowDetailModal}
+                messageFail={messageFailDetail}
+                fetchData={fetchDataDetail}
+            />
         </Modal>
     );
 };

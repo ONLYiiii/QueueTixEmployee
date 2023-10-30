@@ -1,19 +1,10 @@
-import {
-    View,
-    Text,
-    StyleSheet,
-    Image,
-    FlatList,
-    TouchableHighlight,
-    SafeAreaView,
-    TouchableOpacity,
-} from "react-native";
+import { View, Text, StyleSheet, Image, FlatList, TouchableHighlight, SafeAreaView, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import Constants from "expo-constants";
 import picdata from "../interface/picdata";
 import { useNavigation } from "@react-navigation/native";
-import rides from "../utils/FetchData.tsx/rides";
+import rides from "../utils/FetchData/rides";
 
 const QueueScreen = () => {
     const navigation: any = useNavigation();

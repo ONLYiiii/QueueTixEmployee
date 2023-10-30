@@ -1,20 +1,11 @@
-import {
-    View,
-    Text,
-    StyleSheet,
-    TextInput,
-    FlatList,
-    TouchableHighlight,
-    SafeAreaView,
-    TouchableOpacity,
-} from "react-native";
+import { View, Text, StyleSheet, TextInput, FlatList, TouchableHighlight, SafeAreaView, TouchableOpacity } from "react-native";
 import type { ColorValue } from "react-native";
 import { Ticket, TicketTemplate } from "../interface/ticket";
 import React, { useState, useEffect } from "react";
 import { Search } from "../components/Icon";
 import { useRoute } from "@react-navigation/native";
 import { dateFormat, getFullTime } from "../utils/dateFormat";
-import ticketList from "../utils/FetchData.tsx/ticketList";
+import ticketList from "../utils/FetchData/ticketList";
 
 const TicketScreen = () => {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -165,9 +156,7 @@ const TicketScreen = () => {
                                 <Text style={styles.TextInBox}>ID Ticket : {item._id}</Text>
                                 <Text style={styles.TextInBox}>Email Customer : {item.email}</Text>
                                 <Text style={styles.TextInBox}>Type of Ticket: {item.type}</Text>
-                                <Text style={styles.TextInBox}>
-                                    Time Check in: {getFullTime(new Date(item.updated_at))}
-                                </Text>
+                                <Text style={styles.TextInBox}>Time Check in: {getFullTime(new Date(item.updated_at))}</Text>
                             </View>
                         );
                     }}
