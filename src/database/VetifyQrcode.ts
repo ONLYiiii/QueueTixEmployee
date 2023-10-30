@@ -158,10 +158,9 @@ export async function exitTicket(email: string, _id: string, dateofuse: string) 
 
         //?--------------------Not_Used--------------------
         else if (ticketDetails.checkinId === null) {
-            const checkinTime = await insertEntranceStatus(ticketDetails.ticketId);
             return {
                 ...returnData,
-                timeCheckin: checkinTime,
+                timeCheckin: ticketDetails.updated_at,
                 status: "not used",
             };
         }
@@ -171,9 +170,10 @@ export async function exitTicket(email: string, _id: string, dateofuse: string) 
         else if (ticketDetails.checkinId !== null) {
             switch (ticketDetails.entrance_status) {
                 case 0: //? Success
+                    const nowTime = await updateEntranceStatus(ticketDetails.ticketId);
                     return {
                         ...returnData,
-                        timeCheckin: ticketDetails.updated_at,
+                        timeCheckin: nowTime,
                         status: "success",
                     };
                 case 1: //? Already Exit
@@ -205,10 +205,25 @@ export async function exitTicket(email: string, _id: string, dateofuse: string) 
     }
 }
 
-export async function insertEntranceStatus(ticketId: string) {
+async function insertEntranceStatus(ticketId: string) {
     try {
         const nowTime = new Date();
         const sql = (await connection).format(`INSERT INTO ticketforentrance VALUE (DEFAULT, 0, ?, ?, ?);`, [nowTime, nowTime, ticketId]);
+        await (await connection).execute<RowDataPacket[]>(sql);
+        return nowTime;
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+}
+
+async function updateEntranceStatus(ticketId: string) {
+    try {
+        const nowTime = new Date();
+        const sql = (await connection).format(`UPDATE ticketforentrance SET entrance_status = 1, updated_at = ? WHERE id_purchasetickettypes = ?;`, [
+            nowTime,
+            ticketId,
+        ]);
         await (await connection).execute<RowDataPacket[]>(sql);
         return nowTime;
     } catch (error) {

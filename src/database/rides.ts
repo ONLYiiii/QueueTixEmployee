@@ -6,7 +6,7 @@ export async function checkStatusTicket(
     email: string,
     _id: string,
     dateofuse: string
-): Promise<"not used" | "no more rides to play" | "error" | "no ticket" | { engName: string; thaiName: string; priceType: string }> {
+): Promise<"not used" | "no more rides to play" | "error" | "no ticket" | { engName: string; thaiName: string; priceType: string; status: string }> {
     try {
         const sql = (await connection).format(
             `SELECT pt.types, tfe.entrance_status, ptt.status_ticket, t.title AS ticketType, ptt.types AS priceType
@@ -28,11 +28,16 @@ export async function checkStatusTicket(
             return "no ticket";
         }
         if (ticketStatus[0].entrance_status !== 0) {
-            return "not used";
+            return { engName: ticketStatus[0].types, thaiName: ticketStatus[0].ticketType, priceType: ticketStatus[0].priceType, status: "not used" };
         } else if (ticketStatus[0].status_ticket === 1) {
-            return "no more rides to play";
+            return {
+                engName: ticketStatus[0].types,
+                thaiName: ticketStatus[0].ticketType,
+                priceType: ticketStatus[0].priceType,
+                status: "no more rides to play",
+            };
         } else {
-            return { engName: ticketStatus[0].types, thaiName: ticketStatus[0].ticketType, priceType: ticketStatus[0].priceType };
+            return { engName: ticketStatus[0].types, thaiName: ticketStatus[0].ticketType, priceType: ticketStatus[0].priceType, status: "success" };
         }
     } catch (error) {
         console.log("Error Found In verifyTicket: " + error);

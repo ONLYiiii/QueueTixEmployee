@@ -7,16 +7,18 @@
     </head>
     <body>
         <img id="Qrcode" />
-        <button onclick="fetchQrcode1(0)" class="button">SuperVisa Ticket</button>
-        <button onclick="fetchQrcode1(1)" class="button">DreamWorldVisa Ticket</button>
-        <button onclick="fetchQrcode1(2)" class="button">Entrance Ticket</button>
+        <button onclick="fetchQrcode1(0)" class="button">Entrance Ticket</button>
+        <button onclick="fetchQrcode1(1)" class="button">IncludeRides Ticket</button>
+        <button onclick="fetchQrcode1(2)" class="button">DreamWorldVisa Ticket</button>
+        <button onclick="fetchQrcode1(3)" class="button">SuperVisa Ticket</button>
     </body>
     <script>
         const fetchQrcode1 = (ticket) => {
             const purchaseTicketId = [
                 "19972cc4-8010-421c-aecf-f8daf287f504",
-                "ead065cc-ca7c-4b9f-a63d-485278925aa5",
-                "64737c23-20cd-47f8-8966-05e20c0f1f90",
+                "e19b3b96-a991-40a2-8adc-88eb284ac29d",
+                "f06e4d58-f9ec-4a60-bc44-dc146da70064",
+                "ffd61f35-69ad-4fb3-9576-df0db9f410a1",
             ];
             const data = {
                 data: purchaseTicketId[ticket],
