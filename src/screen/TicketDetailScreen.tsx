@@ -78,7 +78,9 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, messageFail, fetc
                             </Text>
                             <Text>วันที่ใช้บัตรได้: {getFullDate(new Date(fetchData.date_of_use))}</Text>
                             <Text>สถานะบัตร: {statusMessage(fetchData.entrance_status)}</Text>
-                            {fetchData.updated_at && <Text>เวลาที่ใช้งาน: {getFullTime(new Date(fetchData.updated_at))}</Text>}
+                            {fetchData.entrance_status !== 2 && fetchData.updated_at && (
+                                <Text>เวลาที่ใช้งาน: {getFullTime(new Date(fetchData.updated_at))}</Text>
+                            )}
                         </>
                     ) : (
                         <Text>Error Found: {messageFail}</Text>

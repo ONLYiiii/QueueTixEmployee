@@ -12,6 +12,7 @@ interface fetchDataType {
     rideName?: string;
     ticketType?: string;
     priceType?: string;
+    cooldown?: number;
     timeCheckin?: string;
     status: string;
 }
@@ -75,6 +76,10 @@ const RidesScannerScreen = () => {
                     case "limit": //? Can't Play This Ride
                         setFetchData(result);
                         setmassageFail("ตั๋วไม่สามารถเล่นเครื่องเล่นนี้ได้แล้ว");
+                        break;
+                    case "cooldown":
+                        setFetchData(result);
+                        setmassageFail("ยังไม่สามารถเล่นเครื่องเล่นได้");
                         break;
                     case "error": //? Error
                         setmassageFail("เกิดข้อผิดพลาด");
@@ -168,6 +173,8 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
                             <Text style={{ fontSize: 14 }}>Check In: {getFullTime(new Date(fetchData.timeCheckin))}</Text>
                         )
                     )}
+
+                    {fetchData.cooldown !== undefined && <Text style={{ fontSize: 14 }}>สามารถเล่นได้อีกภายใน {fetchData.cooldown} นาที</Text>}
 
                     <TouchableHighlight
                         onPress={() => {

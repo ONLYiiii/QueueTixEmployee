@@ -30,8 +30,9 @@ const QrcodeScanner = ({
     }, []);
 
     return (
-        permissionStatus && (
-            <View>
+        permissionStatus &&
+        !hasScanned && (
+            <View style={{ backgroundColor: "black" }}>
                 <BlurView intensity={90}>
                     <Camera
                         style={{ width: "100%", height: "100%", justifyContent: "center", alignItems: "center" }}

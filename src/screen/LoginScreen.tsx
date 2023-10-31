@@ -36,9 +36,10 @@ const LoginScreen = () => {
                     await AsyncStorage.setItem("token", fetchData.token);
                     await AsyncStorage.setItem("fullname", fetchData.fullname);
                     if (fetchData.message === "Login successful") {
-                        navigation.navigate("Home");
+                        navigation.replace("Home");
                     } else {
-                        navigation.navigate("Password", { token: fetchData.token });
+                        await AsyncStorage.setItem("changePass", "true");
+                        navigation.replace("Password", { token: fetchData.token });
                     }
                 } else {
                     setErrorBox(true);

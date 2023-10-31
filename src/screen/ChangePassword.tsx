@@ -1,5 +1,6 @@
 import { View, Text, TextInput, TouchableHighlight, Dimensions } from "react-native";
 import React, { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import getURL from "../utils/getURL";
 
@@ -20,7 +21,7 @@ const ChangePassword = ({ route }: { route: any }) => {
                 body: JSON.stringify({ password: newPassword }),
             }).then((response) => {
                 if (response.ok) {
-                    navigation.navigate("Home");
+                    AsyncStorage.removeItem("changePass").then(() => navigation.replace("Home"));
                 } else {
                     alert("Error");
                 }

@@ -1,10 +1,11 @@
 import { View, Text, StyleSheet, TouchableNativeFeedback, SafeAreaView, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { getAccountType } from "../utils/getStorageData";
-import { Scanner, Ticket, Fastpass, Queue } from "../components/Icon";
+import { Scanner, Ticket, Fastpass } from "../components/Icon";
 import { useNavigation } from "@react-navigation/native";
 import { dateFormat } from "../utils/dateFormat";
 import getURL from "../utils/getURL";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HomeScreen = () => {
     const navigation: any = useNavigation();
@@ -91,58 +92,86 @@ const HomeScreen = () => {
 
             <View style={{ flex: 4.5, rowGap: 15 }}>
                 <Text style={{ fontSize: 20, marginLeft: 40, fontWeight: "600" }}>Menu</Text>
-                <TouchableNativeFeedback
-                    onPress={() => {
-                        navigation.navigate("Scanner");
-                    }}
-                >
-                    <View style={styles.button_Scanner}>
-                        <View style={styles.content_Scanner}>
-                            <Scanner size={50} color="#F16B4E" />
-                        </View>
-                        <Text style={{ fontSize: 20, fontWeight: "500", marginTop: 5 }}>Check In</Text>
-                    </View>
-                </TouchableNativeFeedback>
-                <TouchableNativeFeedback
-                    onPress={() => {
-                        navigation.navigate("ScannerOut");
-                    }}
-                >
-                    <View style={styles.button_Scanner}>
-                        <View style={styles.content_Scanner}>
-                            <Scanner size={50} color="#F16B4E" />
-                        </View>
-                        <Text style={{ fontSize: 20, fontWeight: "500", marginTop: 5 }}>Check Out</Text>
-                    </View>
-                </TouchableNativeFeedback>
                 <View style={{ flexDirection: "row", width: "100%", height: "27%", columnGap: 10 }}>
-                    <TouchableNativeFeedback onPress={() => navigation.navigate("Ticket")}>
-                        <View style={[styles.button_Ticket, { marginLeft: 40 }]}>
-                            <View style={styles.content_Ticket}>
-                                <Ticket size={50} color="#448ADC" />
-                            </View>
-                            <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 5 }}>Ticket</Text>
-                        </View>
-                    </TouchableNativeFeedback>
-                    <TouchableNativeFeedback onPress={() => navigation.navigate("Rides")}>
-                        <View style={styles.button_Ticket}>
-                            <View style={styles.content_Fastpass}>
-                                <Fastpass size={50} color="#00AD50" />
-                            </View>
-                            <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 5 }}>Rides</Text>
-                        </View>
-                    </TouchableNativeFeedback>
+                    {types === "พนักงานตรวจสอบบัตรผ่านประตู" ? (
+                        <>
+                            <TouchableNativeFeedback
+                                onPress={() => {
+                                    navigation.navigate("Scanner");
+                                }}
+                            >
+                                <View style={[styles.button_Ticket, , { marginLeft: 40 }]}>
+                                    <View style={[styles.content_Ticket, { borderColor: "#1dc756", backgroundColor: "#b1f1bc" }]}>
+                                        <Scanner size={50} color="#1dc756" />
+                                    </View>
+                                    <Text style={{ fontSize: 20, fontWeight: "500", marginTop: 5 }}>Check In</Text>
+                                </View>
+                            </TouchableNativeFeedback>
+                            <TouchableNativeFeedback
+                                onPress={() => {
+                                    navigation.navigate("ScannerOut");
+                                }}
+                            >
+                                <View style={styles.button_Ticket}>
+                                    <View style={[styles.content_Ticket, { borderColor: "#dc4444", backgroundColor: "#f1b1b1" }]}>
+                                        <Scanner size={50} color="#F16B4E" />
+                                    </View>
+                                    <Text style={{ fontSize: 20, fontWeight: "500", marginTop: 5 }}>Check Out</Text>
+                                </View>
+                            </TouchableNativeFeedback>
+                        </>
+                    ) : (
+                        <>
+                            <TouchableNativeFeedback onPress={() => navigation.navigate("Rides")}>
+                                <View style={[styles.button_Ticket, { marginLeft: 40 }]}>
+                                    <View style={styles.content_Fastpass}>
+                                        <Fastpass size={50} color="#00AD50" />
+                                    </View>
+                                    <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 5 }}>Rides</Text>
+                                </View>
+                            </TouchableNativeFeedback>
+                            <TouchableNativeFeedback onPress={() => navigation.navigate("Fastpass")}>
+                                <View style={[styles.button_Ticket]}>
+                                    <View style={styles.content_Fastpass}>
+                                        <Fastpass size={50} color="#00AD50" />
+                                    </View>
+                                    <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 5 }}>Fastpass</Text>
+                                </View>
+                            </TouchableNativeFeedback>
+                        </>
+                    )}
                 </View>
-                <TouchableNativeFeedback onPress={() => navigation.navigate("Queue")}>
-                    <View style={styles.button_Queue}>
-                        <View style={styles.content_Queue}>
-                            <Queue size={50} color="#F3C95B" />
+                <TouchableNativeFeedback onPress={() => navigation.navigate("Ticket")}>
+                    <View style={[styles.button_Queue, { marginLeft: 40 }]}>
+                        <View style={[styles.content_Ticket, { borderColor: "#448ADC", backgroundColor: "#B1CFF1" }]}>
+                            <Ticket size={50} color="#448ADC" />
                         </View>
-                        <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 5 }}>Queue Fastpass</Text>
+                        <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 5 }}>Ticket</Text>
+                    </View>
+                </TouchableNativeFeedback>
+                <TouchableNativeFeedback
+                    onPress={() => {
+                        AsyncStorage.removeItem("token").then(() => {
+                            navigation.replace("Login");
+                        });
+                    }}
+                >
+                    <View
+                        style={{
+                            alignSelf: "center",
+                            marginTop: 50,
+                            backgroundColor: "#210066",
+                            width: "80%",
+                            height: "8%",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: 10,
+                        }}
+                    >
+                        <Text style={{ color: "white", fontSize: 20 }}>Log Out</Text>
                     </View>
                 </TouchableNativeFeedback>
             </View>
-            {/* <View style={{ flex: 1 }}></View> */}
         </SafeAreaView>
     );
 };
@@ -190,9 +219,7 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 80 / 2,
-        borderColor: "#448ADC",
         borderWidth: 4,
-        backgroundColor: "#B1CFF1",
         alignItems: "center",
         justifyContent: "center",
     },
