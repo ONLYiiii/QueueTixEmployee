@@ -25,11 +25,8 @@ router.post("/", async (req: Request, res: Response) => {
             res.status(400).send({ status: "error" });
             res.end();
         } else {
-            const tickettype: string | { engName: string; thaiName: string; priceType: string; status: string } = await checkStatusTicket(
-                user_email,
-                purchaseoftypesId,
-                dateofuse
-            );
+            const tickettype: string | { engName: string; thaiName: string; priceType: string; cooldown?: number; status: string } =
+                await checkStatusTicket(user_email, purchaseoftypesId, dateofuse);
             console.log(tickettype);
             if (typeof tickettype === "string") {
                 res.status(400).send({ status: tickettype });
@@ -40,6 +37,16 @@ router.post("/", async (req: Request, res: Response) => {
                     rideName: rideDetails.rideName,
                     ticketType: tickettype.thaiName,
                     priceType: tickettype.priceType,
+                    status: tickettype.status,
+                });
+                res.end();
+                return;
+            } else if (tickettype.status === "cooldown") {
+                res.status(400).send({
+                    rideName: rideDetails.rideName,
+                    ticketType: tickettype.thaiName,
+                    priceType: tickettype.priceType,
+                    cooldown: tickettype.cooldown,
                     status: tickettype.status,
                 });
                 res.end();

@@ -6,7 +6,13 @@ export async function checkStatusTicket(
     email: string,
     _id: string,
     dateofuse: string
-): Promise<"not used" | "no more rides to play" | "error" | "no ticket" | { engName: string; thaiName: string; priceType: string; status: string }> {
+): Promise<
+    | "not used"
+    | "no more rides to play"
+    | "error"
+    | "no ticket"
+    | { engName: string; thaiName: string; priceType: string; cooldown?: number; status: string }
+> {
     try {
         const sql = (await connection).format(
             `SELECT pt.types, tfe.entrance_status, ptt.status_ticket, t.title AS ticketType, ptt.types AS priceType
@@ -22,7 +28,6 @@ export async function checkStatusTicket(
             WHERE ptt._id = ? AND u.email = ? AND pt.date_of_use = ?;`,
             [_id, email, getFullDate(new Date(dateofuse))]
         );
-        console.log(sql);
         const [ticketStatus] = await (await connection).execute<RowDataPacket[]>(sql);
         if (ticketStatus.length === 0) {
             return "no ticket";
@@ -37,6 +42,27 @@ export async function checkStatusTicket(
                 status: "no more rides to play",
             };
         } else {
+            const cooldownCheckSql = (await connection).format(
+                `SELECT updated_at FROM purchaseticketofrides
+                WHERE id_purchasetickettypes = ?
+                ORDER BY updated_at DESC
+                LIMIT 1;`,
+                [_id]
+            );
+            const [lastPlayTime] = await (await connection).execute<RowDataPacket[]>(cooldownCheckSql);
+            const t1 = new Date();
+            const t2 = new Date(lastPlayTime[0].updated_at);
+            const diffTime = (t1.getTime() - t2.getTime()) / 1000;
+            if (diffTime <= 300) {
+                return {
+                    engName: ticketStatus[0].types,
+                    thaiName: ticketStatus[0].ticketType,
+                    priceType: ticketStatus[0].priceType,
+                    cooldown: 5 - Math.floor(diffTime / 60),
+                    status: "cooldown",
+                };
+            }
+
             return { engName: ticketStatus[0].types, thaiName: ticketStatus[0].ticketType, priceType: ticketStatus[0].priceType, status: "success" };
         }
     } catch (error) {
