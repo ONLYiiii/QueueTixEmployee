@@ -40,7 +40,8 @@ const HomeScreen = () => {
         });
         getAccountType("types").then((getTypes: string | null) => {
             if (getTypes) {
-                const thaiTypes = getTypes === "พนักงานตรวจสอบบัตรผ่านประตู" ? getTypes : `พนักงานประจำเครื่องเล่น${getTypes}`;
+                const thaiTypes =
+                    getTypes === "พนักงานตรวจสอบบัตรผ่านประตู" ? getTypes : `พนักงานประจำเครื่องเล่น${getTypes}`;
                 setTypes(thaiTypes);
             }
         });
@@ -101,7 +102,12 @@ const HomeScreen = () => {
                                 }}
                             >
                                 <View style={[styles.button_Ticket, , { marginLeft: 40 }]}>
-                                    <View style={[styles.content_Ticket, { borderColor: "#1dc756", backgroundColor: "#b1f1bc" }]}>
+                                    <View
+                                        style={[
+                                            styles.content_Ticket,
+                                            { borderColor: "#1dc756", backgroundColor: "#b1f1bc" },
+                                        ]}
+                                    >
                                         <Scanner size={50} color="#1dc756" />
                                     </View>
                                     <Text style={{ fontSize: 20, fontWeight: "500", marginTop: 5 }}>Check In</Text>
@@ -113,7 +119,12 @@ const HomeScreen = () => {
                                 }}
                             >
                                 <View style={styles.button_Ticket}>
-                                    <View style={[styles.content_Ticket, { borderColor: "#dc4444", backgroundColor: "#f1b1b1" }]}>
+                                    <View
+                                        style={[
+                                            styles.content_Ticket,
+                                            { borderColor: "#dc4444", backgroundColor: "#f1b1b1" },
+                                        ]}
+                                    >
                                         <Scanner size={50} color="#F16B4E" />
                                     </View>
                                     <Text style={{ fontSize: 20, fontWeight: "500", marginTop: 5 }}>Check Out</Text>
@@ -124,18 +135,28 @@ const HomeScreen = () => {
                         <>
                             <TouchableNativeFeedback onPress={() => navigation.navigate("Rides")}>
                                 <View style={[styles.button_Ticket, { marginLeft: 40 }]}>
-                                    <View style={styles.content_Fastpass}>
-                                        <Fastpass size={50} color="#00AD50" />
+                                    <View style={[styles.content_Fastpass, { backgroundColor: "#F3C95B" }]}>
+                                        <Fastpass size={50} color="white" />
                                     </View>
-                                    <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 5 }}>Rides</Text>
+                                    <View style={{ alignSelf: "flex-start", marginLeft: 10, marginTop: 10 }}>
+                                        <Text style={{ fontSize: 16, fontWeight: "500", marginTop: 5 }}>Rides</Text>
+                                        <Text style={{ fontSize: 14, fontWeight: "500", marginTop: 5 }}>
+                                            Scan Ticket
+                                        </Text>
+                                    </View>
                                 </View>
                             </TouchableNativeFeedback>
                             <TouchableNativeFeedback onPress={() => navigation.navigate("Fastpass")}>
                                 <View style={[styles.button_Ticket]}>
-                                    <View style={styles.content_Fastpass}>
-                                        <Fastpass size={50} color="#00AD50" />
+                                    <View style={[styles.content_Fastpass, { backgroundColor: "#1dc756" }]}>
+                                        <Fastpass size={50} color="white" />
                                     </View>
-                                    <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 5 }}>Fastpass</Text>
+                                    <View style={{ alignSelf: "flex-start", marginLeft: 10, marginTop: 10 }}>
+                                        <Text style={{ fontSize: 16, fontWeight: "500", marginTop: 5 }}>Ticket</Text>
+                                        <Text style={{ fontSize: 14, fontWeight: "500", marginTop: 5 }}>
+                                            Scan Ticket Fastpass
+                                        </Text>
+                                    </View>
                                 </View>
                             </TouchableNativeFeedback>
                         </>
@@ -143,10 +164,13 @@ const HomeScreen = () => {
                 </View>
                 <TouchableNativeFeedback onPress={() => navigation.navigate("Ticket")}>
                     <View style={[styles.button_Queue, { marginLeft: 40 }]}>
-                        <View style={[styles.content_Ticket, { borderColor: "#448ADC", backgroundColor: "#B1CFF1" }]}>
-                            <Ticket size={50} color="#448ADC" />
+                        <View style={[styles.content_Ticket, { backgroundColor: "#897FFF" }]}>
+                            <Ticket size={50} color="white" />
                         </View>
-                        <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 5 }}>Ticket</Text>
+                        <View style={{ alignSelf: "flex-start", marginLeft: 10, marginTop: 4 }}>
+                            <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 5 }}>Ticket</Text>
+                            <Text style={{ fontSize: 14, fontWeight: "500", marginTop: 5 }}>Read Ticket Data</Text>
+                        </View>
                     </View>
                 </TouchableNativeFeedback>
                 <TouchableNativeFeedback
@@ -218,18 +242,14 @@ const styles = StyleSheet.create({
     content_Ticket: {
         width: 80,
         height: 80,
-        borderRadius: 80 / 2,
-        borderWidth: 4,
+        borderRadius: 8,
         alignItems: "center",
         justifyContent: "center",
     },
     content_Fastpass: {
         width: 80,
         height: 80,
-        borderRadius: 80 / 2,
-        borderColor: "#00AD50",
-        borderWidth: 4,
-        backgroundColor: "#C9E9D8",
+        borderRadius: 6,
         alignItems: "center",
         justifyContent: "center",
     },
