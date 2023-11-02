@@ -76,7 +76,7 @@ const ScannerOutScreen = () => {
                         break;
                     case "exit": //? Already Exit
                         setFetchData(result);
-                        setmassageFail("ตั๋วนี้ถูกใช้และออกจากสวนสนุกไปเเล้ว");
+                        setmassageFail("ตั๋วนี้เคยใช้ไปเเล้ว");
                         break;
                     case "expired": //? Already Expired
                         setFetchData(result);
@@ -174,14 +174,16 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
                     >
                         <Text style={{ color: "white", fontSize: 18 }}>Close</Text>
                     </TouchableHighlight>
-                    <TouchableOpacity
-                        style={{ alignSelf: "flex-end", marginRight: 10 }}
-                        onPress={() => {
-                            ticketDetails(scannerData, setMessageFailDetail, setShowDetailModal, setFetchDataDetail);
-                        }}
-                    >
-                        <Text style={{ color: "red", fontSize: 14 }}>ดูข้อมูลเพิ่มเติม</Text>
-                    </TouchableOpacity>
+                    {messageFail !== "เกิดข้อผิดพลาด" && messageFail !== "ไม่มีตั๋วนี้ในระบบ" && (
+                        <TouchableOpacity
+                            style={{ alignSelf: "flex-end", marginRight: 10 }}
+                            onPress={() => {
+                                ticketDetails(scannerData, setMessageFailDetail, setShowDetailModal, setFetchDataDetail);
+                            }}
+                        >
+                            <Text style={{ color: "red", fontSize: 14 }}>ดูข้อมูลเพิ่มเติม</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
             </View>
             <TicketDetailModal
@@ -205,16 +207,20 @@ const StatusComponent = ({ success, messageFail, fetchData }: { success: boolean
                     <Text style={{ fontSize: 14 }}>ใช้ได้วันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
                 </>
             );
-        case "ตั๋วนี้ถูกใช้และออกจากสวนสนุกไปเเล้ว":
+        case "ตั๋วนี้เคยใช้ไปเเล้ว":
             return (
                 <>
                     <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
                     <Text style={{ fontSize: 14 }}>ออกจากสวนสนุกเมื่อวันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
-                    <Text style={{ fontSize: 14 }}>เวลา {getFullTime(new Date(fetchData.timeCheckin!))}</Text>
+                    <Text style={{ fontSize: 14 }}>เวลา {getFullTime(new Date(fetchData.timeCheckin!), true)}</Text>
                 </>
             );
         default:
-            return <Text style={{ fontSize: 14 }}>{success ? `Time Check in : ${getFullTime(new Date(fetchData.timeCheckin!))}` : messageFail}</Text>;
+            return (
+                <Text style={{ fontSize: 14 }}>
+                    {success ? `Time Check in : ${getFullTime(new Date(fetchData.timeCheckin!), true)}` : messageFail}
+                </Text>
+            );
     }
 };
 

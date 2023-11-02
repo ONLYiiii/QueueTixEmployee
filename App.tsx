@@ -45,28 +45,32 @@ const routes: Array<React.ComponentProps<typeof Stack.Screen>> = [
         name: "Ticket",
         component: TicketDetailScreen,
         options: {
-            headerShown: false,
+            headerShown: true,
+            headerBackTitle: "Back",
         },
     },
     {
         name: "Fastpass",
         component: FastpassScannerScreen,
         options: {
-            headerShown: false,
+            headerShown: true,
+            headerBackTitle: "Back",
         },
     },
     {
         name: "Scanner",
         component: ScannerScreen,
         options: {
-            headerShown: false,
+            headerShown: true,
+            headerBackTitle: "Back",
         },
     },
     {
         name: "ScannerOut",
         component: ScannerOutScreen,
         options: {
-            headerShown: false,
+            headerShown: true,
+            headerBackTitle: "Back",
         },
     },
     {
@@ -88,7 +92,8 @@ const routes: Array<React.ComponentProps<typeof Stack.Screen>> = [
         name: "Rides",
         component: RidesScannerScreen,
         options: {
-            headerShown: false,
+            headerShown: true,
+            headerBackTitle: "Back",
         },
     },
 ];

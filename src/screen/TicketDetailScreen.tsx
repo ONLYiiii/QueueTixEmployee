@@ -79,7 +79,7 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, messageFail, fetc
                             <Text>วันที่ใช้บัตรได้: {getFullDate(new Date(fetchData.date_of_use))}</Text>
                             <Text>สถานะบัตร: {statusMessage(fetchData.entrance_status)}</Text>
                             {fetchData.entrance_status !== 2 && fetchData.updated_at && (
-                                <Text>เวลาที่ใช้งาน: {getFullTime(new Date(fetchData.updated_at))}</Text>
+                                <Text>เวลาที่ใช้งาน: {getFullTime(new Date(fetchData.updated_at), true)}</Text>
                             )}
                         </>
                     ) : (
@@ -103,9 +103,9 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, messageFail, fetc
 const statusMessage = (entrance_status: number | null) => {
     switch (entrance_status) {
         case 0:
-            return "ใช้แล้ว";
+            return "กำลังใช้งาน";
         case 1:
-            return "ออกจากสวนสนุกแล้ว";
+            return "ถูกใช้เเล้ว";
         case 2:
             return "หมดอายุ";
         default:

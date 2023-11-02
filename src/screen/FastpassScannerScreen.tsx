@@ -9,6 +9,8 @@ import { getAccountType } from "../utils/getStorageData";
 
 interface fetchDataType {
     timeCheckin?: string;
+    startRound?: Date;
+    endRound?: Date;
     rideName?: string;
     status: string;
 }
@@ -145,9 +147,22 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
                     <Text style={{ fontSize: 16, textAlign: "center" }}>{success ? `ใช้ Fastpass สำเร็จ` : `ใช้ Fastpass ไม่สำเร็จ`}</Text>
                     {fetchData.rideName && <Text style={{ fontSize: 14, textAlign: "center" }}>เครื่องเล่น{fetchData.rideName}</Text>}
                     {success ? (
-                        <Text style={{ fontSize: 14, textAlign: "center" }}>Time Check: {getFullTime(new Date(fetchData.timeCheckin!))}</Text>
+                        <Text style={{ fontSize: 14, textAlign: "center" }}>Time Check: {getFullTime(new Date(fetchData.timeCheckin!), true)}</Text>
                     ) : (
-                        <Text style={{ fontSize: 14, textAlign: "center", color: "red" }}>{messageFail}</Text>
+                        <>
+                            <Text style={{ fontSize: 14, textAlign: "center", color: "red" }}>{messageFail}</Text>
+                            {fetchData.timeCheckin !== undefined && (
+                                <Text style={{ fontSize: 14, textAlign: "center" }}>
+                                    เล่นเครื่องเล่นเมื่อ {getFullTime(new Date(fetchData.timeCheckin), true)}
+                                </Text>
+                            )}
+                            {fetchData.startRound !== undefined && fetchData.endRound !== undefined && (
+                                <Text style={{ fontSize: 14, textAlign: "center" }}>
+                                    รอบที่จองไว้ {getFullTime(new Date(fetchData.startRound), false)} -{" "}
+                                    {getFullTime(new Date(fetchData.endRound), false)}
+                                </Text>
+                            )}
+                        </>
                     )}
 
                     <TouchableHighlight

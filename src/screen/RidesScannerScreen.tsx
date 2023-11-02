@@ -71,7 +71,7 @@ const RidesScannerScreen = () => {
                         break;
                     case "no more rides to play": //? No Ride To Play
                         setFetchData(result);
-                        setmassageFail("ตั๋วไม่สามารถใช้เล่นเครื่องเล่นได้แล้ว");
+                        setmassageFail("ตั๋วไม่สามารถใช้เล่นเครื่องเล่นในสวนสนุกได้แล้ว");
                         break;
                     case "limit": //? Can't Play This Ride
                         setFetchData(result);
@@ -79,7 +79,7 @@ const RidesScannerScreen = () => {
                         break;
                     case "cooldown":
                         setFetchData(result);
-                        setmassageFail("ยังไม่สามารถเล่นเครื่องเล่นได้");
+                        setmassageFail("ตั๋วนี้อยู่ระหว่างการเล่นเครื่องเล่น");
                         break;
                     case "error": //? Error
                         setmassageFail("เกิดข้อผิดพลาด");
@@ -170,7 +170,7 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
                         <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
                     ) : (
                         fetchData.timeCheckin !== undefined && (
-                            <Text style={{ fontSize: 14 }}>Check In: {getFullTime(new Date(fetchData.timeCheckin))}</Text>
+                            <Text style={{ fontSize: 14 }}>Check In: {getFullTime(new Date(fetchData.timeCheckin), true)}</Text>
                         )
                     )}
 
