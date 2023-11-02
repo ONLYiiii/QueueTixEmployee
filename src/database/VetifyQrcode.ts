@@ -1,6 +1,7 @@
 import type { RowDataPacket } from "mysql2";
 import { connection } from "../configs/database";
 import { getFullDate } from "../service/dateFormat";
+import { v4 as uuidv4 } from "uuid";
 
 interface ticketDetailsType {
     ticketId: string;
@@ -29,7 +30,7 @@ export async function verifyTicket(email: string, _id: string, dateofuse: string
             JOIN ticket t
                 ON pt.id_ticket = t._id
             WHERE ptt._id = ?  AND u.email = ? AND pt.date_of_use = ?;`,
-            [_id, email, new Date(dateofuse)]
+            [_id, email, getFullDate(new Date(dateofuse))]
         );
         const [Resultis_Active] = await (await connection).execute<RowDataPacket[]>(sql); //รันโค้ดsqlที่เขียนไว้บรรทัดบน
         //?---------------------------------------------------
@@ -208,7 +209,7 @@ export async function exitTicket(email: string, _id: string, dateofuse: string) 
 async function insertEntranceStatus(ticketId: string) {
     try {
         const nowTime = new Date();
-        const sql = (await connection).format(`INSERT INTO ticketforentrance VALUE (DEFAULT, 0, ?, ?, ?);`, [nowTime, nowTime, ticketId]);
+        const sql = (await connection).format(`INSERT INTO ticketforentrance VALUE (?, 0, ?, ?, ?);`, [uuidv4(), nowTime, nowTime, ticketId]);
         await (await connection).execute<RowDataPacket[]>(sql);
         return nowTime;
     } catch (error) {

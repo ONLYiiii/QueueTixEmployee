@@ -150,6 +150,7 @@ app.post("/qrcode/verify", (req: Request, res: Response) => {
     const email = req.body.data.user_email;
     const id = req.body.data.purchaseoftypesId;
     const dateofuse = req.body.data.dateofuse;
+    console.log(req.body.data);
     CheckTicketID(email, id, dateofuse, mode).then((result) => {
         if (result.status === "success") {
             res.status(200).send(result);

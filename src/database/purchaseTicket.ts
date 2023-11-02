@@ -1,6 +1,7 @@
 import type { RowDataPacket } from "mysql2";
 import { connection } from "../configs/database";
 import type Ticket from "../types/ticket";
+import { getFullDate } from "../service/dateFormat";
 
 export async function findPurchaseTicketID(idTicket: string) {
     try {
@@ -27,7 +28,7 @@ export async function findTicketDetails(_id: string, email: string, dateofuse: s
             JOIN ticket t
                 ON pt.id_ticket = t._id
             WHERE ptt._id = ? AND u.email = ? AND pt.date_of_use = ?;`,
-            [_id, email, new Date(dateofuse)]
+            [_id, email, getFullDate(new Date(dateofuse))]
         );
         const [ticketRows] = await (await connection).execute<RowDataPacket[]>(sql);
         console.log(ticketRows);
