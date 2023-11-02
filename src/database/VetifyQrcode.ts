@@ -43,7 +43,8 @@ export async function verifyTicket(email: string, _id: string, dateofuse: string
 
         //?--------------------Prepare_Data--------------------
         const ticketDetails = Resultis_Active[0] as ticketDetailsType;
-        const today = getFullDate(new Date());
+        const today = new Date(getFullDate(new Date()));
+        const useDate = new Date(getFullDate(ticketDetails.date_of_use));
         const returnData = {
             _id: Resultis_Active[0]._id,
             type: Resultis_Active[0].type,
@@ -52,11 +53,17 @@ export async function verifyTicket(email: string, _id: string, dateofuse: string
         //?----------------------------------------------------
 
         //?--------------------Not_Today--------------------
-        if (getFullDate(ticketDetails.date_of_use) !== today) {
+        if (useDate > today) {
             return {
                 ...returnData,
                 timeCheckin: ticketDetails.date_of_use,
                 status: "not this date",
+            };
+        } else if (useDate < today) {
+            return {
+                ...returnData,
+                timeCheckin: ticketDetails.date_of_use,
+                status: "expired",
             };
         }
         //?-------------------------------------------------
@@ -139,7 +146,8 @@ export async function exitTicket(email: string, _id: string, dateofuse: string) 
 
         //?--------------------Prepare_Data--------------------
         const ticketDetails = Resultis_Active[0] as ticketDetailsType;
-        const today = getFullDate(new Date());
+        const today = new Date(getFullDate(new Date()));
+        const useDate = new Date(getFullDate(ticketDetails.date_of_use));
         const returnData = {
             _id: Resultis_Active[0]._id,
             type: Resultis_Active[0].type,
@@ -148,11 +156,17 @@ export async function exitTicket(email: string, _id: string, dateofuse: string) 
         //?----------------------------------------------------
 
         //?--------------------Not_Today--------------------
-        if (getFullDate(ticketDetails.date_of_use) !== today) {
+        if (useDate > today) {
             return {
                 ...returnData,
                 timeCheckin: ticketDetails.date_of_use,
                 status: "not this date",
+            };
+        } else if (useDate < today) {
+            return {
+                ...returnData,
+                timeCheckin: ticketDetails.date_of_use,
+                status: "expired",
             };
         }
         //?-------------------------------------------------
@@ -161,7 +175,7 @@ export async function exitTicket(email: string, _id: string, dateofuse: string) 
         else if (ticketDetails.checkinId === null) {
             return {
                 ...returnData,
-                timeCheckin: ticketDetails.updated_at,
+                timeCheckin: ticketDetails.date_of_use,
                 status: "not used",
             };
         }
@@ -209,7 +223,8 @@ export async function exitTicket(email: string, _id: string, dateofuse: string) 
 async function insertEntranceStatus(ticketId: string) {
     try {
         const nowTime = new Date();
-        const sql = (await connection).format(`INSERT INTO ticketforentrance VALUE (?, 0, ?, ?, ?);`, [uuidv4(), nowTime, nowTime, ticketId]);
+        const sql = (await connection).format(`INSERT INTO ticketforentrance VALUE (?, ?, 0, ?, ?);`, [uuidv4(), ticketId, nowTime, nowTime]);
+        console.log(sql);
         await (await connection).execute<RowDataPacket[]>(sql);
         return nowTime;
     } catch (error) {

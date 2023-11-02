@@ -155,3 +155,29 @@ export async function updateStatusTicket(id_purchasetickettypes: string, ticketT
         return false;
     }
 }
+
+export async function updateRoundRides(rideId: string): Promise<boolean> {
+    try {
+        const nowDate = new Date();
+        const findSql = (await connection).format(
+            `SELECT rrtf._id, rrtf.used_count FROM roundrides rr
+            JOIN roundridesofticketfastpass rrtf
+                ON rr._id = rrtf.id_roundrides
+            WHERE rr.id_rides = ? AND rr.start_time > ? AND rrtf.types = 'Normal'
+            ORDER BY start_time LIMIT 1;`,
+            [rideId, `${nowDate.getHours()}:${nowDate.getMinutes()}`]
+        );
+        const [nextRound] = await (await connection).execute<RowDataPacket[]>(findSql);
+        const updateSql = (await connection).format(
+            `UPDATE roundridesofticketfastpass
+            SET used_count = ?
+            WHERE _id = ?;`,
+            [++nextRound[0].used_count, nextRound[0]._id]
+        );
+        await (await connection).execute(updateSql);
+        return true;
+    } catch (error) {
+        console.log("Error Found In updateStatusTicket: " + error);
+        return false;
+    }
+}

@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 import type { Router, Request, Response } from "express";
 
 //? Database
-import { checkStatusTicket, findEmployeeRideId, updateUsedCount, updateStatusTicket } from "../database/rides";
-import { updateFastpassIsUsed } from "../database/fastpass";
+import { checkStatusTicket, findEmployeeRideId, updateUsedCount, updateStatusTicket, updateRoundRides } from "../database/rides";
+import { updateFastpassIsUsed, findFastpassDetails } from "../database/fastpass";
 
 //? Service
 import getSecretKey from "../service/getSecretKey";
@@ -69,6 +69,7 @@ router.post("/", async (req: Request, res: Response) => {
                 }
             } else {
                 const changeStatusResult = await updateStatusTicket(purchaseoftypesId, tickettype.engName, nowTime);
+                await updateRoundRides(rideDetails.rideId);
                 if (changeStatusResult) {
                     res.send({
                         rideName: rideDetails.rideName,
@@ -93,7 +94,7 @@ router.post("/", async (req: Request, res: Response) => {
 
 //* Route "/rides/fastpass"
 router.post("/fastpass", async (req: Request, res: Response) => {
-    const { user_email, idpurchaseFastpassOfRides } = req.body;
+    const { id } = req.body;
     try {
         const token: string = req.headers.authorization as string;
         const decoded: { sub: string } = jwt.verify(token, getSecretKey()) as { sub: string };
@@ -102,9 +103,8 @@ router.post("/fastpass", async (req: Request, res: Response) => {
             res.status(400).send({ status: "error" });
             res.end();
         } else {
-            const updateResult: { timeCheckin?: Date; status: string } = await updateFastpassIsUsed(
-                user_email,
-                idpurchaseFastpassOfRides,
+            const updateResult: { timeCheckin?: Date; startRound?: Date; endRound?: Date; status: string } = await updateFastpassIsUsed(
+                id,
                 rideDetails.rideId
             );
             if (updateResult.status !== "success") {
@@ -120,6 +120,23 @@ router.post("/fastpass", async (req: Request, res: Response) => {
         res.status(400).send({ status: "error" });
         res.end();
     }
+});
+
+//* Route "/rides/fastpass/details"
+router.get("/fastpass/details", (req: Request, res: Response) => {
+    const data = JSON.parse(req.query.data as string);
+    findFastpassDetails(data.id).then((fastpassDetails) => {
+        if (fastpassDetails.status === "error") {
+            res.status(400);
+            res.end();
+        } else if (fastpassDetails.status === "No Ticket") {
+            res.status(404);
+            res.end();
+        } else {
+            res.send(fastpassDetails);
+            res.end();
+        }
+    });
 });
 
 export default router;
