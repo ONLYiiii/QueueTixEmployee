@@ -52,14 +52,43 @@ export async function verifyTicket(email: string, _id: string, dateofuse: string
         };
         //?----------------------------------------------------
 
+        //?--------------------Not_Success--------------------
+        if (ticketDetails.checkinId !== null) {
+            switch (ticketDetails.entrance_status) {
+                case 0: //? Already Used
+                    return {
+                        ...returnData,
+                        timeCheckin: ticketDetails.updated_at,
+                        status: "used",
+                    };
+                case 1: //? Already Exit
+                    return {
+                        ...returnData,
+                        timeCheckin: ticketDetails.updated_at,
+                        status: "exit",
+                    };
+                case 2: //? Already Expired
+                    await updateTicketStatus(_id);
+                    return {
+                        ...returnData,
+                        timeCheckin: ticketDetails.date_of_use,
+                        status: "expired",
+                    };
+                default:
+                    return { status: "error" };
+            }
+        }
+        //?---------------------------------------------------
+
         //?--------------------Not_Today--------------------
-        if (useDate > today) {
+        else if (useDate > today) {
             return {
                 ...returnData,
                 timeCheckin: ticketDetails.date_of_use,
                 status: "not this date",
             };
         } else if (useDate < today) {
+            await updateTicketStatus(_id);
             return {
                 ...returnData,
                 timeCheckin: ticketDetails.date_of_use,
@@ -78,33 +107,6 @@ export async function verifyTicket(email: string, _id: string, dateofuse: string
             };
         }
         //?-----------------------------------------------
-
-        //?--------------------Not_Success--------------------
-        else if (ticketDetails.checkinId !== null) {
-            switch (ticketDetails.entrance_status) {
-                case 0: //? Already Used
-                    return {
-                        ...returnData,
-                        timeCheckin: ticketDetails.updated_at,
-                        status: "used",
-                    };
-                case 1: //? Already Exit
-                    return {
-                        ...returnData,
-                        timeCheckin: ticketDetails.updated_at,
-                        status: "exit",
-                    };
-                case 2: //? Already Expired
-                    return {
-                        ...returnData,
-                        timeCheckin: ticketDetails.date_of_use,
-                        status: "expired",
-                    };
-                default:
-                    return { status: "error" };
-            }
-        }
-        //?---------------------------------------------------
 
         //?--------------------Error--------------------
         else {
@@ -244,6 +246,56 @@ async function updateEntranceStatus(ticketId: string) {
         return nowTime;
     } catch (error) {
         console.log(error);
+        return false;
+    }
+}
+
+async function updateTicketStatus(_id: string) {
+    try {
+        //?--------------------Find_OrderId--------------------
+        const findOrderSql = (await connection).format(
+            `SELECT pt.id_order, ptt.status_ticket, pt.status FROM purchasetickettypes ptt
+            JOIN purchaseticket pt
+                ON ptt.id_purchaseticket = pt._id
+            WHERE ptt._id = ?;`,
+            [_id]
+        );
+        const [[orderIdRows]] = await (await connection).execute<RowDataPacket[]>(findOrderSql);
+        //?----------------------------------------------------
+        if (orderIdRows.status_ticket !== 2 || orderIdRows.status !== "Completed") {
+            //?--------------------Find_purchasetickettypesId--------------------
+            const findIdSql = (await connection).format(
+                `SELECT ptt._id FROM purchasetickettypes ptt
+            JOIN purchaseticket pt
+                ON ptt.id_purchaseticket = pt._id
+            WHERE pt.id_order = ?;`,
+                [orderIdRows.id_order]
+            );
+            const [idRows] = await (await connection).execute<RowDataPacket[]>(findIdSql);
+            //?------------------------------------------------------------------
+            //?--------------------Prepare_Date--------------------
+            const nowTime = new Date();
+            //?----------------------------------------------------
+            //?--------------------Update_status_ticket--------------------
+            const idArray = idRows.map((item) => item._id);
+            const updateStatusTicketSql = (await connection).format(
+                `UPDATE purchasetickettypes SET status_ticket = 2, updated_at = ? WHERE _id IN (?)`,
+                [nowTime, idArray]
+            );
+            await (await connection).execute(updateStatusTicketSql);
+            //?------------------------------------------------------------
+            //?--------------------Update_status--------------------
+            const updateStatusSql = (await connection).format(`UPDATE purchaseticket SET status = 3, updated_at = ? WHERE id_order = ?`, [
+                nowTime,
+                orderIdRows.id_order,
+            ]);
+            await (await connection).execute(updateStatusSql);
+            //?-----------------------------------------------------
+        }
+
+        return true;
+    } catch (error) {
+        console.log("Error Found In updateTicketStatus: " + error);
         return false;
     }
 }

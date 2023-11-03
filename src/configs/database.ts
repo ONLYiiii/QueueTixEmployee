@@ -4,7 +4,7 @@ require("dotenv").config();
 const databaseAccount = {
     namedPlaceholders: true,
     host: process.env.HOST,
-    // port: 12635,
+    port: process.env.PORT === undefined ? 3306 : parseInt(process.env.PORT),
     user: process.env.USER,
     password: process.env.PASSWORD,
     database: process.env.DATABASE,

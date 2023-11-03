@@ -130,6 +130,8 @@ export async function updateStatusTicket(id_purchasetickettypes: string, ticketT
             ]);
             await (await connection).execute(sql);
         } else if (ticketType === "IncludeRides") {
+            await updateIncludeStatus(id_purchasetickettypes, nowTime);
+
             const findSql = (await connection).format(`SELECT used_count FROM purchaseticketofrides WHERE id_purchasetickettypes = ?;`, [
                 id_purchasetickettypes,
             ]);
@@ -142,7 +144,7 @@ export async function updateStatusTicket(id_purchasetickettypes: string, ticketT
                 }
             }
             if (count === usedCountLength) {
-                const updateSql = (await connection).format(`UPDATE purchasetickettypes SET status_ticket = 1, updated_at = ? WHERE _id = ?;`, [
+                const updateSql = (await connection).format(`UPDATE purchaseticket SET status = 3, updated_at = ? WHERE _id = ?;`, [
                     nowTime,
                     id_purchasetickettypes,
                 ]);
@@ -178,6 +180,24 @@ export async function updateRoundRides(rideId: string): Promise<boolean> {
         return true;
     } catch (error) {
         console.log("Error Found In updateStatusTicket: " + error);
+        return false;
+    }
+}
+
+async function updateIncludeStatus(id_purchasetickettypes: string, nowTime: Date) {
+    try {
+        const findSql = (await connection).format(`SELECT status_ticket FROM purchasetickettypes WHERE _id = ?;`, [id_purchasetickettypes]);
+        const [[status_ticketRows]] = await (await connection).execute<RowDataPacket[]>(findSql);
+        if (status_ticketRows.status_ticket === 0) {
+            const updateSql = (await connection).format(`UPDATE purchasetickettypes SET status_ticket = 1, updated_at = ? WHERE _id = ?`, [
+                nowTime,
+                id_purchasetickettypes,
+            ]);
+            await (await connection).execute(updateSql);
+        }
+        return true;
+    } catch (error) {
+        console.log("Error Found In updateIncludeStatus: " + error);
         return false;
     }
 }
