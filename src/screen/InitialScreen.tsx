@@ -24,7 +24,7 @@ const InitialScreen = () => {
                     }).then((response) => {
                         if (response.ok) {
                             if (changePass === "true") {
-                                setIsLogin(2);
+                                navigation.replace("Password", { token: token });
                             } else {
                                 setIsLogin(1);
                             }
@@ -41,8 +41,6 @@ const InitialScreen = () => {
         return <LoginScreen />;
     } else if (isLogin === 1) {
         return <HomeScreen />;
-    } else if (isLogin === 2) {
-        navigation.replace("Password");
     }
     return <></>;
 };
