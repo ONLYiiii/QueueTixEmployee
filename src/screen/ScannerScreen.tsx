@@ -11,7 +11,7 @@ import ticketDetails from "../utils/FetchData/ticketDetails";
 interface fetchDataType {
     _id?: string;
     type?: string;
-    timeCheckin?: string;
+    timeCheckin?: Date;
     priceType?: string;
     status: string;
 }
@@ -41,6 +41,7 @@ const ScannerScreen = () => {
         //ข้อมูลที่สแกน QR Code มี type(เวอร์ชั่น QR Code) กับ data
         setHasScanned(true);
         setScannerData(data);
+        console.log(data);
         fetch(getURL() + "qrcode/verify/", {
             method: "POST",
             body: JSON.stringify({ data: JSON.parse(data), mode: "IN" }),
@@ -130,14 +131,25 @@ interface modalController {
     scannerData: string;
 }
 
-const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageFail, fetchData, scannerData }: modalController) => {
+const ResultModal = ({
+    showModal,
+    setShowModal,
+    setHasScanned,
+    success,
+    messageFail,
+    fetchData,
+    scannerData,
+}: modalController) => {
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [messageFailDetail, setMessageFailDetail] = useState("");
-    const [fetchDataDetail, setFetchDataDetail]: [ticketDetailType, Dispatch<SetStateAction<ticketDetailType>>] = useState();
+    const [fetchDataDetail, setFetchDataDetail]: [ticketDetailType, Dispatch<SetStateAction<ticketDetailType>>] =
+        useState();
 
     return (
         <Modal visible={showModal} transparent={true} animationType="slide">
-            <View style={{ backgroundColor: "rgba(0,0,0,0.25)", flex: 1, justifyContent: "center", alignItems: "center" }}>
+            <View
+                style={{ backgroundColor: "rgba(0,0,0,0.25)", flex: 1, justifyContent: "center", alignItems: "center" }}
+            >
                 <View
                     style={{
                         backgroundColor: "rgb(255,255,255)",
@@ -163,7 +175,9 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
                             fetchData.priceType !== undefined &&
                             `ใช้${fetchData.type} - บัตร${fetchData.priceType === "Adult" ? "ผู้ใหญ่" : "เด็ก"}`}
                         {success ? "สำเร็จ" : "ไม่สำเร็จ"}
-                        {fetchData.type === undefined && fetchData.priceType === undefined && `ใช้บัตรเล่นเครื่องเล่นไม่สำเร็จ`}
+                        {fetchData.type === undefined &&
+                            fetchData.priceType === undefined &&
+                            `ใช้บัตรเล่นเครื่องเล่นไม่สำเร็จ`}
                     </Text>
 
                     <StatusComponent success={success} messageFail={messageFail} fetchData={fetchData} />
@@ -181,7 +195,12 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
                         <TouchableOpacity
                             style={{ alignSelf: "flex-end", marginRight: 10 }}
                             onPress={() => {
-                                ticketDetails(scannerData, setMessageFailDetail, setShowDetailModal, setFetchDataDetail);
+                                ticketDetails(
+                                    scannerData,
+                                    setMessageFailDetail,
+                                    setShowDetailModal,
+                                    setFetchDataDetail
+                                );
                             }}
                         >
                             <Text style={{ color: "red", fontSize: 14 }}>ดูข้อมูลเพิ่มเติม</Text>
@@ -199,13 +218,23 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
     );
 };
 
-const StatusComponent = ({ success, messageFail, fetchData }: { success: boolean; messageFail: string; fetchData: fetchDataType }) => {
+const StatusComponent = ({
+    success,
+    messageFail,
+    fetchData,
+}: {
+    success: boolean;
+    messageFail: string;
+    fetchData: fetchDataType;
+}) => {
     switch (messageFail) {
         case "ตั๋วนี้กำลังใช้งาน":
             return (
                 <>
                     <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
-                    <Text style={{ fontSize: 14 }}>เข้าสวนสนุกเมื่อวันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
+                    <Text style={{ fontSize: 14 }}>
+                        เข้าสวนสนุกเมื่อวันที่ {getFullDate(new Date(fetchData.timeCheckin!))}
+                    </Text>
                     <Text style={{ fontSize: 14 }}>เวลา {getFullTime(new Date(fetchData.timeCheckin!), true)}</Text>
                 </>
             );
@@ -221,7 +250,9 @@ const StatusComponent = ({ success, messageFail, fetchData }: { success: boolean
             return (
                 <>
                     <Text style={{ fontSize: 14, color: "red" }}>{messageFail}</Text>
-                    <Text style={{ fontSize: 14 }}>ออกจากสวนสนุกเมื่อวันที่ {getFullDate(new Date(fetchData.timeCheckin!))}</Text>
+                    <Text style={{ fontSize: 14 }}>
+                        ออกจากสวนสนุกเมื่อวันที่ {getFullDate(new Date(fetchData.timeCheckin!))}
+                    </Text>
                     <Text style={{ fontSize: 14 }}>เวลา {getFullTime(new Date(fetchData.timeCheckin!), true)}</Text>
                 </>
             );

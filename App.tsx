@@ -11,6 +11,7 @@ import LoginScreen from "./src/screen/LoginScreen";
 import ChangePassword from "./src/screen/ChangePassword";
 import RidesScannerScreen from "./src/screen/RidesScannerScreen";
 import FastpassScannerScreen from "./src/screen/FastpassScannerScreen";
+import FAQScreen from "./src/screen/FAQScreen";
 
 type AppStackParamList = {
     Initial: undefined;
@@ -22,6 +23,7 @@ type AppStackParamList = {
     Scanner: undefined;
     ScannerOut: undefined;
     Rides: undefined;
+    FAQ: undefined;
 };
 
 const Stack = createStackNavigator<AppStackParamList>();
@@ -96,12 +98,19 @@ const routes: Array<React.ComponentProps<typeof Stack.Screen>> = [
             headerBackTitle: "Back",
         },
     },
+    {
+        name: "FAQ",
+        component: FAQScreen,
+        options: {
+            headerShown: false,
+        },
+    },
 ];
 
 export default function App() {
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="Initial">
+            <Stack.Navigator initialRouteName="FAQ">
                 {routes.map((routeConfig) => (
                     <Stack.Screen key={routeConfig.name} {...routeConfig} />
                 ))}

@@ -4,14 +4,14 @@ import { MaterialIcons, MaterialCommunityIcons, Feather, Entypo, Ionicons } from
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 
-export const Back = ({ size, color }: { size?: number; color?: string | OpaqueColorValue }) => (
-    <Ionicons name="arrow-back-sharp" size={size} color={color} />
+export const Ticket = ({ size, color }: { size?: number; color?: string | OpaqueColorValue }) => (
+    <Entypo name="ticket" size={size} color={color} />
 );
 
 export const Scanner = ({ size, color }: { size?: number; color?: string | OpaqueColorValue }) => (
     <MaterialIcons name="qr-code-scanner" size={size} color={color} />
 );
-export const Ticket = ({ size, color }: { size?: number; color?: string | OpaqueColorValue }) => (
+export const Ride = ({ size, color }: { size?: number; color?: string | OpaqueColorValue }) => (
     <MaterialCommunityIcons name="ticket" size={size} color={color} />
 );
 export const Fastpass = ({ size, color }: { size?: number; color?: string | OpaqueColorValue }) => (
@@ -62,3 +62,53 @@ export const Checkinout = ({
     color?: string | OpaqueColorValue;
     style?: StyleProp<TextStyle>;
 }) => <Ionicons name="md-exit-outline" size={size} color={color} style={style} />;
+
+export const FAQfire = ({
+    size,
+    color,
+    style,
+}: {
+    size?: number;
+    color?: string | OpaqueColorValue;
+    style?: StyleProp<TextStyle>;
+}) => <FontAwesome5 name="fire-alt" size={size} color={color} style={style} />;
+
+export const FAQTicket = ({
+    size,
+    color,
+    style,
+}: {
+    size?: number;
+    color?: string | OpaqueColorValue;
+    style?: StyleProp<TextStyle>;
+}) => <Entypo name="ticket" size={size} color={color} style={style} />;
+
+export const FAQFastpass = ({
+    size,
+    color,
+    style,
+}: {
+    size?: number;
+    color?: string | OpaqueColorValue;
+    style?: StyleProp<TextStyle>;
+}) => <MaterialCommunityIcons name="human-queue" size={size} color={color} style={style} />;
+
+export const FAQPayment = ({
+    size,
+    color,
+    style,
+}: {
+    size?: number;
+    color?: string | OpaqueColorValue;
+    style?: StyleProp<TextStyle>;
+}) => <MaterialIcons name="payment" size={size} color={color} style={style} />;
+
+export const up = ({
+    size,
+    color,
+    style,
+}: {
+    size?: number;
+    color?: string | OpaqueColorValue;
+    style?: StyleProp<TextStyle>;
+}) => <AntDesign name="up" size={size} color={color} style={style} />;

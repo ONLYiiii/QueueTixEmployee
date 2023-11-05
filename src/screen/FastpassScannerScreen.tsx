@@ -36,6 +36,7 @@ const FastpassScannerScreen = () => {
     const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
         //ข้อมูลที่สแกน QR Code มี type(เวอร์ชั่น QR Code) กับ data
         setHasScanned(true);
+        console.log(data);
         fetch(getURL() + "rides/fastpass", {
             method: "POST",
             body: data,
@@ -124,7 +125,9 @@ interface modalController {
 const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageFail, fetchData }: modalController) => {
     return (
         <Modal visible={showModal} transparent={true} animationType="slide">
-            <View style={{ backgroundColor: "rgba(0,0,0,0.25)", flex: 1, justifyContent: "center", alignItems: "center" }}>
+            <View
+                style={{ backgroundColor: "rgba(0,0,0,0.25)", flex: 1, justifyContent: "center", alignItems: "center" }}
+            >
                 <View
                     style={{
                         backgroundColor: "rgb(255,255,255)",
@@ -144,10 +147,16 @@ const ResultModal = ({ showModal, setShowModal, setHasScanned, success, messageF
                     ) : (
                         <Cross size={90} color="red" />
                     )}
-                    <Text style={{ fontSize: 16, textAlign: "center" }}>{success ? `ใช้ Fastpass สำเร็จ` : `ใช้ Fastpass ไม่สำเร็จ`}</Text>
-                    {fetchData.rideName && <Text style={{ fontSize: 14, textAlign: "center" }}>เครื่องเล่น{fetchData.rideName}</Text>}
+                    <Text style={{ fontSize: 16, textAlign: "center" }}>
+                        {success ? `ใช้ Fastpass สำเร็จ` : `ใช้ Fastpass ไม่สำเร็จ`}
+                    </Text>
+                    {fetchData.rideName && (
+                        <Text style={{ fontSize: 14, textAlign: "center" }}>เครื่องเล่น{fetchData.rideName}</Text>
+                    )}
                     {success ? (
-                        <Text style={{ fontSize: 14, textAlign: "center" }}>Time Check: {getFullTime(new Date(fetchData.timeCheckin!), true)}</Text>
+                        <Text style={{ fontSize: 14, textAlign: "center" }}>
+                            Time Check: {getFullTime(new Date(fetchData.timeCheckin!), true)}
+                        </Text>
                     ) : (
                         <>
                             <Text style={{ fontSize: 14, textAlign: "center", color: "red" }}>{messageFail}</Text>

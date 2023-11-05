@@ -6,7 +6,6 @@ import getURL from "../utils/getURL";
 
 const ChangePassword = ({ route }: { route: any }) => {
     const navigation: any = useNavigation();
-
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const { token } = route.params;
