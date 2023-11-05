@@ -1,11 +1,15 @@
 import { View, Text, StyleSheet, TouchableNativeFeedback, SafeAreaView, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { getAccountType } from "../utils/getStorageData";
-import { Scanner, Ticket, Fastpass } from "../components/Icon";
+import { Scanner, Ticket, Fastpass, Checkinout } from "../components/Icon";
 import { useNavigation } from "@react-navigation/native";
 import { dateFormat } from "../utils/dateFormat";
 import getURL from "../utils/getURL";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+// import CheckinIcon from "../../assets/SvgPic/Entrance.svg";
+
+//Svg
+const checkinPic = require("../../assets/SvgPic/Entrance.svg");
 
 const HomeScreen = () => {
     const navigation: any = useNavigation();
@@ -40,7 +44,8 @@ const HomeScreen = () => {
         });
         getAccountType("types").then((getTypes: string | null) => {
             if (getTypes) {
-                const thaiTypes = getTypes === "พนักงานตรวจสอบบัตรผ่านประตู" ? getTypes : `พนักงานประจำเครื่องเล่น${getTypes}`;
+                const thaiTypes =
+                    getTypes === "พนักงานตรวจสอบบัตรผ่านประตู" ? getTypes : `พนักงานประจำเครื่องเล่น${getTypes}`;
                 setTypes(thaiTypes);
             }
         });
@@ -101,10 +106,20 @@ const HomeScreen = () => {
                                 }}
                             >
                                 <View style={[styles.button_Ticket, , { marginLeft: 40 }]}>
-                                    <View style={[styles.content_Ticket, { borderColor: "#1dc756", backgroundColor: "#b1f1bc" }]}>
-                                        <Scanner size={50} color="#1dc756" />
+                                    <View
+                                        style={[
+                                            styles.content_Ticket,
+                                            { borderColor: "#1dc756", backgroundColor: "#b1f1bc" },
+                                        ]}
+                                    >
+                                        <Checkinout size={50} color="#1dc756" />
                                     </View>
-                                    <Text style={{ fontSize: 20, fontWeight: "500", marginTop: 5 }}>Check In</Text>
+                                    <View style={{ alignItems: "flex-start" }}>
+                                        <Text style={{ fontSize: 16, fontWeight: "500", marginTop: 5 }}>Check In</Text>
+                                        <Text style={{ fontSize: 14, fontWeight: "500", marginTop: 5 }}>
+                                            Scan for Entrance amusement
+                                        </Text>
+                                    </View>
                                 </View>
                             </TouchableNativeFeedback>
                             <TouchableNativeFeedback
@@ -113,10 +128,20 @@ const HomeScreen = () => {
                                 }}
                             >
                                 <View style={styles.button_Ticket}>
-                                    <View style={[styles.content_Ticket, { borderColor: "#dc4444", backgroundColor: "#f1b1b1" }]}>
-                                        <Scanner size={50} color="#F16B4E" />
+                                    <View
+                                        style={[
+                                            styles.content_Ticket,
+                                            { borderColor: "#dc4444", backgroundColor: "#f1b1b1" },
+                                        ]}
+                                    >
+                                        <Checkinout size={50} color="#dc4444" />
                                     </View>
-                                    <Text style={{ fontSize: 20, fontWeight: "500", marginTop: 5 }}>Check Out</Text>
+                                    <View>
+                                        <Text style={{ fontSize: 16, fontWeight: "500", marginTop: 5 }}>Check Out</Text>
+                                        <Text style={{ fontSize: 14, fontWeight: "500", marginTop: 5 }}>
+                                            Scan for Exit amusement
+                                        </Text>
+                                    </View>
                                 </View>
                             </TouchableNativeFeedback>
                         </>
@@ -129,7 +154,9 @@ const HomeScreen = () => {
                                     </View>
                                     <View style={{ alignSelf: "flex-start", marginLeft: 10, marginTop: 10 }}>
                                         <Text style={{ fontSize: 16, fontWeight: "500", marginTop: 5 }}>Rides</Text>
-                                        <Text style={{ fontSize: 14, fontWeight: "500", marginTop: 5 }}>Scan Ticket</Text>
+                                        <Text style={{ fontSize: 14, fontWeight: "500", marginTop: 5 }}>
+                                            Scan Ticket
+                                        </Text>
                                     </View>
                                 </View>
                             </TouchableNativeFeedback>
@@ -140,7 +167,9 @@ const HomeScreen = () => {
                                     </View>
                                     <View style={{ alignSelf: "flex-start", marginLeft: 10, marginTop: 10 }}>
                                         <Text style={{ fontSize: 16, fontWeight: "500", marginTop: 5 }}>Fastpass</Text>
-                                        <Text style={{ fontSize: 14, fontWeight: "500", marginTop: 5 }}>Scan Ticket Fastpass</Text>
+                                        <Text style={{ fontSize: 14, fontWeight: "500", marginTop: 5 }}>
+                                            Scan Ticket Fastpass
+                                        </Text>
                                     </View>
                                 </View>
                             </TouchableNativeFeedback>
@@ -259,6 +288,10 @@ const styles = StyleSheet.create({
         backgroundColor: "#FCE6AD",
         alignItems: "center",
         justifyContent: "center",
+    },
+    pic: {
+        width: 70,
+        height: 70,
     },
 });
 export default HomeScreen;
