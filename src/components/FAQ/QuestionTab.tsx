@@ -89,7 +89,8 @@ const styles = StyleSheet.create({
     icon: {
         paddingHorizontal: 10,
         paddingVertical: 7,
-        borderRadius: 30,
+        borderRadius: 20,
         marginBottom: 7,
+        overflow: "hidden",
     },
 });

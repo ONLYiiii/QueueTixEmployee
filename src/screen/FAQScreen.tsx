@@ -12,7 +12,6 @@ const FAQScreen = () => {
             style={{
                 flex: 1,
                 alignItems: "center",
-                // justifyContent: "center",
             }}
         >
             <Text style={{ fontSize: 20, fontWeight: "bold" }}>QueueTix Help Center</Text>
